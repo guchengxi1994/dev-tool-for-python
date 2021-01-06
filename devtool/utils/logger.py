@@ -1,6 +1,6 @@
 '''
 lanhuage: python
-Descripttion:  copy from labelme/logger.py
+Descripttion:  copied from labelme/logger.py
 version: beta
 Author: xiaoshuyui
 Date: 2020-08-19 08:59:04
@@ -10,7 +10,7 @@ LastEditTime: 2020-10-15 08:33:46
 import logging
 
 import termcolor
-from convertmask import __appname__
+from devtool import __appname__
 
 COLORS = {
     'WARNING': 'yellow',

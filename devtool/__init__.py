@@ -8,6 +8,7 @@ LastEditors: xiaoshuyui
 LastEditTime: 2021-01-06 16:58:24
 '''
 __version__ = '0.0.0'
+__appname__ = 'DevTool'
 
 from functools import wraps
 
