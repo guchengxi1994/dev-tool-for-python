@@ -3,12 +3,10 @@ lanhuage: python
 Descripttion: 
 version: beta
 Author: xiaoshuyui
-Date: 2021-01-06 11:36:12
+Date: 2021-01-06 15:13:32
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-06 15:29:27
+LastEditTime: 2021-01-06 16:26:01
 '''
-import importlib
-import os
 import sys
 from setuptools import find_packages
 from pkgutil import iter_modules
@@ -29,10 +27,3 @@ def find_modules(path):
                 if not info.ispkg:
                     modules.add(pkg + '.' + info.name)
     return list(modules)
-
-
-if __name__ == "__main__":
-    module = importlib.__import__('devtool.utils')
-    modulePath = os.path.dirname(module.__file__)
-
-    print(find_modules(modulePath))

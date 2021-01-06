@@ -5,9 +5,20 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 10:51:46
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-06 11:34:27
+LastEditTime: 2021-01-06 16:18:41
 '''
+# import devtool.tests.utils.func1
+import importlib
 from devtool.devTool import DevTool
+import inspect
 
 if __name__ == "__main__":
-    DevTool.do('devtool.tests')
+    # name = 'devtool.tests.utils.func1'
+    # module = importlib.import_module(name)
+    # # print(module)
+    # # # print(dir(devtool.tests.utils.func1))
+    # member_list = inspect.getmembers(module, predicate=inspect.isfunction)
+    # for v,_ in member_list:
+    #     print(v)
+
+    DevTool.do('devtool')
