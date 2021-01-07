@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-06 16:58:24
+LastEditTime: 2021-01-07 10:18:22
 '''
 __version__ = '0.0.0'
 __appname__ = 'DevTool'
@@ -62,3 +62,7 @@ def infoDecorate(message: str = '', **infomation):
         return sub_dec
 
     return decorator
+
+
+def logit():
+    pass

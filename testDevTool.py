@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 10:51:46
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-06 16:18:41
+LastEditTime: 2021-01-07 08:48:35
 '''
 # import devtool.tests.utils.func1
 import importlib
@@ -23,4 +23,4 @@ if __name__ == "__main__":
 
     DevTool.do('devtool')
 
-    DevTool.tree('devtool')
+    DevTool.treeWithState('devtool')
