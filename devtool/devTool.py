@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:26:44
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-07 09:59:51
+LastEditTime: 2021-01-07 11:15:38
 '''
 import importlib
 import os
@@ -13,7 +13,8 @@ import os
 from devtool.utils.getFunctions import find_functions
 from devtool.utils.getModules import find_modules
 from devtool.utils.logger import logger
-from termcolor import colored, cprint
+from termcolor import colored
+from devtool import __current_platform__
 
 
 class DevTool:
@@ -112,11 +113,18 @@ class DevTool:
                         for i in cls.storage:
                             tmpModu = i.func.__module__
                             if tmpModu == moduleName + tmp:
-                                text = colored('{}{}'.format(
-                                    file_indent, f + " -- " + i.funcName + ' --> ' +
-                                    str(len(i.func.__annotations__))),
-                                               'red',
-                                               attrs=['reverse', 'blink'])
+                                if __current_platform__ == 'Windows':
+                                    text = '{}{}'.format(
+                                        file_indent,
+                                        f + " --> " + i.funcName + ' --> ' +
+                                        str(len(i.func.__annotations__)))
+                                else:
+                                    text = colored('{}{}'.format(
+                                        file_indent,
+                                        f + " --> " + i.funcName + ' --> ' +
+                                        str(len(i.func.__annotations__))),
+                                                   'red',
+                                                   attrs=['reverse', 'blink'])
                                 print(text)
                             else:
                                 print('{}{}'.format(file_indent, f))

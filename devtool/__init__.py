@@ -5,12 +5,39 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-07 10:18:22
+LastEditTime: 2021-01-07 17:03:49
 '''
 __version__ = '0.0.0'
 __appname__ = 'DevTool'
 
+import logging
+import os
+import platform
 from functools import wraps
+
+from concurrent_log_handler import ConcurrentRotatingFileHandler
+
+__current_platform__ = platform.system()
+
+del platform
+
+BASE_DIR = os.path.abspath(os.curdir)
+# print(BASE_DIR)
+
+logit_logger = logging.getLogger(__appname__)
+logit_logger.setLevel(level=logging.INFO)
+
+LOG_PATH = BASE_DIR + os.sep + "logs" + os.sep + 'log.log'
+
+rHandler = ConcurrentRotatingFileHandler(filename=LOG_PATH,
+                                         maxBytes=5 * 1024 * 1024,
+                                         backupCount=5)
+rHandler.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+rHandler.setFormatter(formatter)
+
+logit_logger.addHandler(rHandler)
 
 
 class FuncAndName:
@@ -64,5 +91,12 @@ def infoDecorate(message: str = '', **infomation):
     return decorator
 
 
-def logit():
-    pass
+def logit(func):
+    def execute(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+            logit_logger.info(func.__name__ + ' finishes successfully.')
+        except Exception as e:
+            logit_logger.error(func.__name__ + " " + str(e))
+
+    return execute
