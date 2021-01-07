@@ -81,8 +81,8 @@ class DevTool:
                 if not f.endswith('.pyc'):
                     print('{}{}'.format(file_indent, f))
 
-    @classmethod
-    def logFilter(cls):
+    @staticmethod
+    def logFilter():
         pass
 
     @classmethod
