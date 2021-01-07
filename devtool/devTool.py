@@ -20,9 +20,10 @@ from devtool import __current_platform__
 class DevTool:
     storage = []
     currentModulePath = ''
+    currentModuleName = ''
 
     @classmethod
-    def do(cls, moduleName=''):
+    def exec(cls, moduleName=''):
         print('<================ Init... ================>')
         module = importlib.__import__(moduleName)
         modulePath = os.path.dirname(module.__file__)
@@ -37,11 +38,13 @@ class DevTool:
                 continue
         print('<================ finish ================>')
         cls.currentModulePath = modulePath
+        cls.currentModuleName = moduleName
 
     @classmethod
-    def grep(cls, grepType, *kwds):
+    def grep(cls, moduleName: str, grepType, *kwds):
         """
-        grepType should be a str in ['and','or']
+        grepType should be a str in ['and','or'];
+        moduleName can be 'this' ,which stands for cls.currentModuleName
         """
         if len(cls.storage) == 0:
             print(
@@ -77,6 +80,10 @@ class DevTool:
                 # tmp = root + os.sep + f
                 if not f.endswith('.pyc'):
                     print('{}{}'.format(file_indent, f))
+
+    @classmethod
+    def logFilter(cls):
+        pass
 
     @classmethod
     def treeWithState(cls, moduleName):

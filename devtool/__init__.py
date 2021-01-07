@@ -14,6 +14,7 @@ import logging
 import os
 import platform
 from functools import wraps
+import traceback
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
@@ -27,7 +28,10 @@ BASE_DIR = os.path.abspath(os.curdir)
 logit_logger = logging.getLogger(__appname__)
 logit_logger.setLevel(level=logging.INFO)
 
-LOG_PATH = BASE_DIR + os.sep + "logs" + os.sep + 'log.log'
+if not os.path.exists(BASE_DIR + os.sep + "DevLog"):
+    os.mkdir(BASE_DIR + os.sep + "DevLog")
+
+LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
 
 rHandler = ConcurrentRotatingFileHandler(filename=LOG_PATH,
                                          maxBytes=5 * 1024 * 1024,
@@ -72,8 +76,7 @@ def testWrapper(func):
 def isWrapped(func):
     @wraps(func)
     def inner(*args, **kwargs):
-        global __caches__
-        print(func.__name__ + ' is cached.')
+        # print(func.__name__ + ' is cached.')
         func.__annotations__['wrapped_cached'] = True
         return func(*args, **kwargs)
 
@@ -92,11 +95,15 @@ def infoDecorate(message: str = '', **infomation):
 
 
 def logit(func):
+    @isWrapped
     def execute(*args, **kwargs):
         try:
             func(*args, **kwargs)
-            logit_logger.info(func.__name__ + ' finishes successfully.')
-        except Exception as e:
-            logit_logger.error(func.__name__ + " " + str(e))
+            logit_logger.info(func.__module__ + '.' + func.__name__ +
+                              ' finishes successfully.')
+        except Exception:
+            res = traceback.format_exc()
+            logit_logger.error(func.__module__ + '.' + func.__name__ + " " +
+                               res)
 
     return execute

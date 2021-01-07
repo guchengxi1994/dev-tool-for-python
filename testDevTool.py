@@ -21,6 +21,6 @@ if __name__ == "__main__":
     # for v,_ in member_list:
     #     print(v)
 
-    DevTool.do('devtool')
+    DevTool.exec('devtool')
 
     DevTool.treeWithState('devtool')

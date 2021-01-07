@@ -49,3 +49,4 @@ if __name__ == "__main__":
 
     # print(func1.fc1_1.__module__)
     test4()
+    print (test4.__annotations__)
