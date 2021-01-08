@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-08-19 08:59:04
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 10:40:32
+LastEditTime: 2021-01-08 11:07:09
 '''
 import logging
 
@@ -30,8 +30,11 @@ class ColoredFormatter(logging.Formatter):
     def format(self, record):
         levelname = record.levelname
         if self.use_color and levelname in COLORS:
-            colored_levelname = termcolor.colored('[{}]'.format(levelname),
-                                                  color=COLORS[levelname])
+            if __current_platform__ != 'Windows':
+                colored_levelname = termcolor.colored('[{}]'.format(levelname),
+                                                      color=COLORS[levelname])
+            else:
+                colored_levelname = levelname
             record.levelname = colored_levelname
         return logging.Formatter.format(self, record)
 

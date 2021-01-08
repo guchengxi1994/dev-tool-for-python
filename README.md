@@ -5,10 +5,12 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-01-07 17:28:53
+ * @LastEditTime: 2021-01-08 11:04:10
 -->
 # dev-tool-for-python
  a small tool for python development
+
+[![Build Status](https://www.travis-ci.com/guchengxi1994/dev-tool-for-python.svg?branch=dev)](https://www.travis-ci.com/guchengxi1994/dev-tool-for-python.svg?branch=dev)
 
 
 # Introduction
