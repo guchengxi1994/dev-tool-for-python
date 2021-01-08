@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 08:41:16
+LastEditTime: 2021-01-08 17:24:29
 '''
 __version__ = '0.0.0'
 __appname__ = 'DevTool'
@@ -62,6 +62,10 @@ class FuncAndName:
         return self.funcName
 
 
+def do_nothing():
+    pass
+
+
 def testWrapper(func):
     @wraps(func)
     def inner(*args, **kwargs):
@@ -85,8 +89,15 @@ def setWrap(func):
 
 def infoDecorate(message: str = '', **infomation):
     def decorator(func):
+        @setWrap
         @wraps(func)
         def sub_dec(*args, **kwargs):
+            func.__annotations__[
+                'message'] = message if message != '' else do_nothing
+
+            if len(infomation) > 0:
+                for k, v in infomation.items():
+                    func.__annotations__[k] = v
             return func(*args, **kwargs)
 
         return sub_dec
@@ -107,3 +118,20 @@ def logit(func):
                                res)
 
     return execute
+
+
+def Test(*pas, **params):
+    def decorator(func):
+        @logit
+        def execute(*args, **kwargs):
+            if len(pas) == len(func.__code__.co_varnames):
+                args = pas
+            if len(params) > 0:
+                for k, v in params.items():
+                    if k in func.__code__.co_varnames:
+                        kwargs[k] = v
+            return func(*args, **kwargs)
+
+        return execute
+
+    return decorator

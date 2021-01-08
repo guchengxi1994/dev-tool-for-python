@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:26:44
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 10:52:24
+LastEditTime: 2021-01-08 16:56:29
 '''
 import datetime
 import importlib
@@ -18,7 +18,7 @@ from devtool.utils.common import (match_datetime, validate_date,
                                   validate_datetime)
 from devtool.utils.getFunctions import find_functions
 from devtool.utils.getModules import find_modules
-from devtool.utils.logger import logger
+from devtool import logit_logger
 
 BASE_DIR = os.path.abspath(os.curdir)
 LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
@@ -59,7 +59,7 @@ class DevTool:
             )
         else:
             if grepType not in ['and', 'or']:
-                logger.warning(
+                print(
                     "grepType should be a str in ['and','or'],  but got {}, use 'or' instead."
                     .format(grepType))
                 grepType = 'or'
@@ -89,15 +89,14 @@ class DevTool:
                     print('{}{}'.format(file_indent, f))
 
     @staticmethod
-    @setWrap
     def logFilter(*kwds, **params):
         """
         kwds are the filters, can be like "ERROR" or function name. Also ,add '-' before kwds means except kwds. eg. '-ERROR' means 'NOT ERROR'
         
-        params can be like "from='2021-01-08'","until='2021-01-09'"
+        params can be like "since='2021-01-08'","until='2021-01-09'"
         """
         if not os.path.exists(LOG_PATH):
-            logger.error('No Log File Found!')
+            print('No Log File Found!')
             return
         with open(LOG_PATH, 'r', encoding='utf-8', errors='ignore') as f:
             lines = f.readlines()
@@ -116,45 +115,52 @@ class DevTool:
                             ])
                             break
                     else:
-                        if not j in lines[i] and loggedTime:
-                            res.append([
-                                i + 1,
-                                datetime.datetime.strptime(
-                                    loggedTime[0], '%Y-%m-%d %H:%M:%S')
-                            ])
+                        if loggedTime:
+                            if j[1:] not in lines[i]:
+                                res.append([
+                                    i + 1,
+                                    datetime.datetime.strptime(
+                                        loggedTime[0], '%Y-%m-%d %H:%M:%S')
+                                ])
                             break
-            # print(res)
+
             if len(params) > 0 and len(res) > 0:
-                timeFrom = params.get('from', None)
-                timeUntil = params.get('until', None)
-                if not timeUntil:
-                    endTime = datetime.datetime.now()
-                else:
-                    timeUntil = timeFrom.strip() + ' 23:59:59'
-                    endTime = datetime.datetime.strptime(
-                        timeUntil, '%Y-%m-%d %H:%M:%S')
+                if 'since' in params.keys() or 'until' in params.keys():
+                    timeFrom = params.get('since', None)
+                    timeUntil = params.get('until', None)
+                    if not timeUntil:
+                        endTime = datetime.datetime.now()
+                    else:
+                        timeUntil = timeFrom.strip() + ' 23:59:59'
+                        endTime = datetime.datetime.strptime(
+                            timeUntil, '%Y-%m-%d %H:%M:%S')
 
-                if not timeFrom:
-                    startTime = datetime.datetime.strptime(
-                        (str(datetime.datetime.now())[:11] + '00:00:00'),
-                        '%Y-%m-%d %H:%M:%S')
-                else:
-                    timeFrom = timeFrom.strip() + ' 00:00:00'
-                    startTime = datetime.datetime.strptime(
-                        timeFrom, '%Y-%m-%d %H:%M:%S')
+                    if not timeFrom:
+                        startTime = datetime.datetime.strptime(
+                            ('1970-01-01 00:00:00'), '%Y-%m-%d %H:%M:%S')
+                    else:
+                        timeFrom = timeFrom.strip() + ' 00:00:00'
+                        startTime = datetime.datetime.strptime(
+                            timeFrom, '%Y-%m-%d %H:%M:%S')
 
-                if not startTime < endTime:
-                    logger.error(
-                        'time from must less than time until but got {},{}'.
-                        format(timeFrom, timeUntil))
+                    if not startTime < endTime:
+                        print(
+                            'time from must less than time until but got {},{}'
+                            .format(timeFrom, timeUntil))
+                        return
+
+                    filtRes = []
+                    for i in res:
+                        if i[1] >= startTime and i[1] <= endTime:
+                            filtRes.append(i[0])
+
+                    print(filtRes)
+                else:
+                    print(list(params.keys()))
+                    print(
+                        'Params error. func "logFilter" needs "until" or "since", got "{}"'
+                        .format(' '.join(list(params.keys()))))
                     return
-
-                filtRes = []
-                for i in res:
-                    if i[1] >= startTime and i[1] <= endTime:
-                        filtRes.append(i[0])
-
-                print(filtRes)
 
     @classmethod
     def treeWithState(cls, moduleName):
@@ -165,13 +171,13 @@ class DevTool:
             modulePath = cls.currentModulePath
 
         if len(cls.storage) == 0:
-            logger.error('Plz run DevTool.go() first.')
+            print('Plz run DevTool.exec() first.')
 
         # for i in cls.storage:
         #     print(i.funcName)
         #     print(i.func.__module__)
 
-        for root, dirs, files in os.walk(modulePath):
+        for root, _, files in os.walk(modulePath):
             level = root.replace(modulePath, '').count(os.sep)
             dir_indent = "|   " * (level - 1) + "|-- "
             file_indent = "|   " * level + "|-- "

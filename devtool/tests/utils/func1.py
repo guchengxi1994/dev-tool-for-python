@@ -5,13 +5,13 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:34:53
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-06 16:34:47
+LastEditTime: 2021-01-08 16:52:58
 '''
 
-from devtool import isWrapped
+from devtool import setWrap
 
 
-@isWrapped
+@setWrap
 def fc1_1():
     print(11)
 

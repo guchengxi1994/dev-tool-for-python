@@ -5,12 +5,11 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:33:57
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 08:41:31
+LastEditTime: 2021-01-08 17:24:59
 '''
 
+from devtool import Test, infoDecorate, logit, setWrap, testWrapper
 from devtool.tests.utils import func1
-
-from devtool import logit, testWrapper, setWrap
 
 
 @setWrap
@@ -30,9 +29,20 @@ def test2(aaaa='aaaa'):
 def test3(aaaa='aaaa'):
     assert aaaa is int
 
+
 @logit
 def test4():
-    x = 1/0
+    x = 1 / 0
+
+
+@infoDecorate('a test', id='bb', name='cc')
+def test5():
+    print('aaaaaaaaaaaaaa')
+
+
+@Test( a=43, b=12)
+def test6(a, b):
+    print(a + b)
 
 
 if __name__ == "__main__":
@@ -48,5 +58,10 @@ if __name__ == "__main__":
     # print(li)
 
     # print(func1.fc1_1.__module__)
-    test4()
-    print (test4.__annotations__)
+    # test4()
+    # print (test4.__annotations__)
+
+    # test5()
+    # print(test5.__annotations__)
+
+    test6()

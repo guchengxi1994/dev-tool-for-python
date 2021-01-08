@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 10:51:46
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 10:52:59
+LastEditTime: 2021-01-08 16:03:32
 '''
 import datetime
 import importlib
@@ -35,6 +35,6 @@ if __name__ == "__main__":
     # print(str(datetime.datetime.now())[:11] + '00:00:00')
     # c = validate_datetime(str(datetime.datetime.now())[:11] + '00:00:00')
     # print(c)
-    DevTool.logFilter('ERROR',start='122')
+    DevTool.logFilter('ERROR','INFO',start='122',since='1998-01-01')
 
     print(DevTool.logFilter.__annotations__)
