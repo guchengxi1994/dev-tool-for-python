@@ -5,12 +5,13 @@ version: beta
 Author: xiaoshuyui
 Date: 2020-08-19 08:59:04
 LastEditors: xiaoshuyui
-LastEditTime: 2020-10-15 08:33:46
+LastEditTime: 2021-01-08 10:40:32
 '''
 import logging
 
 import termcolor
 from devtool import __appname__
+from devtool import __current_platform__
 
 COLORS = {
     'WARNING': 'yellow',
@@ -36,8 +37,10 @@ class ColoredFormatter(logging.Formatter):
 
 
 class ColoredLogger(logging.Logger):
-
-    fmt_filename = termcolor.colored('%(filename)s', attrs={'bold': True})
+    if __current_platform__ != "Windows":
+        fmt_filename = termcolor.colored('%(filename)s', attrs={'bold': True})
+    else:
+        fmt_filename = '%(filename)s'
     FORMAT = '%(levelname)s %(message)s ({}:%(lineno)d)'.format(fmt_filename)
 
     def __init__(self, name):

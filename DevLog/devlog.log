@@ -1,4 +1,4 @@
-2021-01-07 21:08:20,115 - DevTool - ERROR - test4 division by zero
+2021-01-07 21:08:20,115 - DevTool - INFO - test4 division by zero
 2021-01-07 21:10:52,818 - DevTool - ERROR - test4 Traceback (most recent call last):
   File "D:\dev-tool-for-python\devtool\__init__.py", line 100, in execute
     func(*args, **kwargs)
@@ -35,6 +35,22 @@ ZeroDivisionError: division by zero
 ZeroDivisionError: division by zero
 
 2021-01-07 21:39:33,760 - DevTool - ERROR - __main__.test4 Traceback (most recent call last):
+  File "D:\dev-tool-for-python\devtool\__init__.py", line 101, in execute
+    func(*args, **kwargs)
+  File ".\testWrap.py", line 35, in test4
+    x = 1/0
+ZeroDivisionError: division by zero
+
+
+2021-01-08 01:35:33,760 - DevTool - ERROR - __main__.test4 Traceback (most recent call last):
+  File "D:\dev-tool-for-python\devtool\__init__.py", line 101, in execute
+    func(*args, **kwargs)
+  File ".\testWrap.py", line 35, in test4
+    x = 1/0
+ZeroDivisionError: division by zero
+
+
+2021-01-08 01:39:33,760 - DevTool - ERROR - __main__.test4 Traceback (most recent call last):
   File "D:\dev-tool-for-python\devtool\__init__.py", line 101, in execute
     func(*args, **kwargs)
   File ".\testWrap.py", line 35, in test4

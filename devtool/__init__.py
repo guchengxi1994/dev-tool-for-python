@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-07 17:03:49
+LastEditTime: 2021-01-08 08:41:16
 '''
 __version__ = '0.0.0'
 __appname__ = 'DevTool'
@@ -73,7 +73,7 @@ def testWrapper(func):
     return inner
 
 
-def isWrapped(func):
+def setWrap(func):
     @wraps(func)
     def inner(*args, **kwargs):
         # print(func.__name__ + ' is cached.')
@@ -95,7 +95,7 @@ def infoDecorate(message: str = '', **infomation):
 
 
 def logit(func):
-    @isWrapped
+    @setWrap
     def execute(*args, **kwargs):
         try:
             func(*args, **kwargs)

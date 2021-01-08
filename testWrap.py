@@ -5,28 +5,28 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:33:57
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-07 17:02:59
+LastEditTime: 2021-01-08 08:41:31
 '''
 
 from devtool.tests.utils import func1
 
-from devtool import logit, testWrapper, isWrapped
+from devtool import logit, testWrapper, setWrap
 
 
-@isWrapped
+@setWrap
 @testWrapper
 def test1():
     print('hello world')
 
 
 @testWrapper
-@isWrapped
+@setWrap
 def test2(aaaa='aaaa'):
     print(aaaa)
 
 
 @testWrapper
-@isWrapped
+@setWrap
 def test3(aaaa='aaaa'):
     assert aaaa is int
 

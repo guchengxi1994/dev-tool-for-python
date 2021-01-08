@@ -5,16 +5,23 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:26:44
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-07 11:15:38
+LastEditTime: 2021-01-08 10:52:24
 '''
+import datetime
 import importlib
 import os
 
+from termcolor import colored
+
+from devtool import __current_platform__, setWrap
+from devtool.utils.common import (match_datetime, validate_date,
+                                  validate_datetime)
 from devtool.utils.getFunctions import find_functions
 from devtool.utils.getModules import find_modules
 from devtool.utils.logger import logger
-from termcolor import colored
-from devtool import __current_platform__
+
+BASE_DIR = os.path.abspath(os.curdir)
+LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
 
 
 class DevTool:
@@ -65,7 +72,7 @@ class DevTool:
         else:
             modulePath = cls.currentModulePath
 
-        for root, dirs, files in os.walk(modulePath):
+        for root, _, files in os.walk(modulePath):
             level = root.replace(modulePath, '').count(os.sep)
             dir_indent = "|   " * (level - 1) + "|-- "
             file_indent = "|   " * level + "|-- "
@@ -82,8 +89,72 @@ class DevTool:
                     print('{}{}'.format(file_indent, f))
 
     @staticmethod
-    def logFilter():
-        pass
+    @setWrap
+    def logFilter(*kwds, **params):
+        """
+        kwds are the filters, can be like "ERROR" or function name. Also ,add '-' before kwds means except kwds. eg. '-ERROR' means 'NOT ERROR'
+        
+        params can be like "from='2021-01-08'","until='2021-01-09'"
+        """
+        if not os.path.exists(LOG_PATH):
+            logger.error('No Log File Found!')
+            return
+        with open(LOG_PATH, 'r', encoding='utf-8', errors='ignore') as f:
+            lines = f.readlines()
+            res = []
+            # print(len(lines))
+            for i in range(0, len(lines)):
+                # if validate_datetime(i)
+                loggedTime = match_datetime(lines[i])
+                for j in kwds:
+                    if not j.startswith('-'):
+                        if j in lines[i] and loggedTime:
+                            res.append([
+                                i + 1,
+                                datetime.datetime.strptime(
+                                    loggedTime[0], '%Y-%m-%d %H:%M:%S')
+                            ])
+                            break
+                    else:
+                        if not j in lines[i] and loggedTime:
+                            res.append([
+                                i + 1,
+                                datetime.datetime.strptime(
+                                    loggedTime[0], '%Y-%m-%d %H:%M:%S')
+                            ])
+                            break
+            # print(res)
+            if len(params) > 0 and len(res) > 0:
+                timeFrom = params.get('from', None)
+                timeUntil = params.get('until', None)
+                if not timeUntil:
+                    endTime = datetime.datetime.now()
+                else:
+                    timeUntil = timeFrom.strip() + ' 23:59:59'
+                    endTime = datetime.datetime.strptime(
+                        timeUntil, '%Y-%m-%d %H:%M:%S')
+
+                if not timeFrom:
+                    startTime = datetime.datetime.strptime(
+                        (str(datetime.datetime.now())[:11] + '00:00:00'),
+                        '%Y-%m-%d %H:%M:%S')
+                else:
+                    timeFrom = timeFrom.strip() + ' 00:00:00'
+                    startTime = datetime.datetime.strptime(
+                        timeFrom, '%Y-%m-%d %H:%M:%S')
+
+                if not startTime < endTime:
+                    logger.error(
+                        'time from must less than time until but got {},{}'.
+                        format(timeFrom, timeUntil))
+                    return
+
+                filtRes = []
+                for i in res:
+                    if i[1] >= startTime and i[1] <= endTime:
+                        filtRes.append(i[0])
+
+                print(filtRes)
 
     @classmethod
     def treeWithState(cls, moduleName):

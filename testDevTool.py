@@ -5,12 +5,16 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 10:51:46
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-07 08:48:35
+LastEditTime: 2021-01-08 10:52:59
 '''
-# import devtool.tests.utils.func1
+import datetime
 import importlib
-from devtool.devTool import DevTool
 import inspect
+
+from devtool.devTool import DevTool
+# import devtool.tests.utils.func1
+from devtool.utils.common import (match_datetime, validate_date,
+                                  validate_datetime)
 
 if __name__ == "__main__":
     # name = 'devtool.tests.utils.func1'
@@ -21,6 +25,16 @@ if __name__ == "__main__":
     # for v,_ in member_list:
     #     print(v)
 
-    DevTool.exec('devtool')
+    # DevTool.exec('devtool')
 
-    DevTool.treeWithState('devtool')
+    # DevTool.treeWithState('devtool')
+
+    # a = match_datetime('2021-01-07 21:19:35,345 - DevTool - ERROR - __main__.test4 Traceback (most recent call last):')
+    # b = validate_date('2021-01-07 '.strip())
+    # # print(b)
+    # print(str(datetime.datetime.now())[:11] + '00:00:00')
+    # c = validate_datetime(str(datetime.datetime.now())[:11] + '00:00:00')
+    # print(c)
+    DevTool.logFilter('ERROR',start='122')
+
+    print(DevTool.logFilter.__annotations__)
