@@ -29,5 +29,38 @@
 
 # HOW TO USE.
 
+## 1. Down load this repo.
+
+## 2. Copy the "devtool" folder into your project.
+
+## 3. Details.
+
+### 3.1 For logs filter.
+
+    from devTool import DevTool
+    DevTool.logFilter(*kwds, **params)
+
+kws are the keywords to be searched,params include path,since and until under this version.
+
+To record log file easily,try this.
+
+    from devTool import logit
+
+    @logit
+    def test4():
+        x = 1 / 0
+    
+    test4()
+
+then DevLog/devlog.log will be created and log information will be added.
+
+    2021-01-09 09:49:00,143 - DevTool - ERROR - __main__.test4 Traceback (most recent call last):
+    File "D:\dev-tool-for-python\devtool\__init__.py", line 112, in execute
+        func(*args, **kwargs)
+    File ".\testWrap.py", line 35, in test4
+        x = 1 / 0
+    ZeroDivisionError: division by zero
+
+
 ![linux](./static/devtool_linux.gif)
 

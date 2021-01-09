@@ -93,12 +93,15 @@ class DevTool:
         """
         kwds are the filters, can be like "ERROR" or function name. Also ,add '-' before kwds means except kwds. eg. '-ERROR' means 'NOT ERROR'
         
-        params can be like "since='2021-01-08'","until='2021-01-09'"
+        params can be like "since='2021-01-08'","until='2021-01-09'", and specific log path "path='xx/xx/xx.log'"
         """
-        if not os.path.exists(LOG_PATH):
+        path = params.get('path', None)
+        if path is None:
+            path = LOG_PATH
+        if not os.path.exists(path):
             print('No Log File Found!')
             return
-        with open(LOG_PATH, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
             lines = f.readlines()
             res = []
             # print(len(lines))

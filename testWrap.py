@@ -58,10 +58,10 @@ if __name__ == "__main__":
     # print(li)
 
     # print(func1.fc1_1.__module__)
-    # test4()
+    test4()
     # print (test4.__annotations__)
 
     # test5()
     # print(test5.__annotations__)
 
-    test6()
+    # test6()
