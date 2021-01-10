@@ -16,6 +16,7 @@ import platform
 from functools import wraps
 import traceback
 import pickle
+import sys
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
@@ -59,6 +60,26 @@ class FuncAndName:
         if not isinstance(o, self.__class__):
             return False
         return self.funcName == o.funcName
+
+    def __str__(self):
+        return self.funcName
+
+
+class FuncnameParamRes:
+    def __init__(self, funcName: str, params: list, res: any):
+        self.funcName = funcName
+        self.params = params
+        self.res = res
+
+    def __hash__(self) -> int:
+        return hash(self.funcName) + hash(self.params[0]) + hash(
+            self.params[1])
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, self.__class__):
+            return False
+        return self.funcName == o.funcName and self.params[0] == o.params[
+            0] and self.params[1] == o.params[1]
 
     def __str__(self):
         return self.funcName
@@ -114,12 +135,16 @@ def logit(**params):
             flag = False
             save = params.get('save', False)
             load = params.get('load', False)
-            if load and os.path.exists(Cache_path):
+            ignore = params.get('ignore', False)
+            if load and os.path.exists(Cache_path) and not ignore:
                 with open(Cache_path, 'rb') as fi:
                     d = pickle.load(fi)
                     if func.__module__ + '.' + func.__name__ in d.keys():
-                        res = d[func.__module__ + '.' + func.__name__]
-                        return res
+                        fan = d[func.__module__ + '.' + func.__name__]
+                        thisFan = FuncnameParamRes(func.__name__, [args, kwargs], None)
+                        if thisFan == fan:
+                            # print('this == that')
+                            return fan.res
                     else:
                         flag = True
             if not flag:
@@ -127,21 +152,25 @@ def logit(**params):
                     res = func(*args, **kwargs)
                     logit_logger.info(func.__module__ + '.' + func.__name__ +
                                       ' finishes successfully.')
+                    fan = FuncnameParamRes(func.__name__, [args, kwargs], res)
                     if save:
                         d = dict()
-                        d[func.__module__ + '.' + func.__name__] = res
-                        # fan = FuncAndName(func.__module__ + '.' + func.__name__,None,'',res)
+                        # d[func.__module__ + '.' + func.__name__] = res
+                        d[func.__module__ + '.' + func.__name__] = fan
                         if not os.path.exists(Cache_path):
                             with open(Cache_path, 'wb') as fi:
-                                pickle.dump(d, fi)
+                                if sys.getsizeof(fan) < 1024:
+                                    pickle.dump(d, fi)
                         else:
-                            with open(Cache_path, 'rb') as fi:
-                                d = pickle.load(fi)
-                                d[func.__module__ + '.' + func.__name__] = res
-                                pickle.dump(d, fi)
+                            if sys.getsizeof(fan) < 1024:
+                                with open(Cache_path, 'rb') as fi:
+                                    d = pickle.load(fi)
+                                with open(Cache_path, 'wb') as fi:
+                                    d[func.__module__ + '.' +
+                                      func.__name__] = fan
+                                    pickle.dump(d, fi)
 
                 except Exception:
-                    # res = traceback.format_exc()
                     logit_logger.error(func.__module__ + '.' + func.__name__ +
                                        " " + traceback.format_exc())
                     res = None

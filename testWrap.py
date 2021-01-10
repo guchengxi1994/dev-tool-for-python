@@ -51,10 +51,10 @@ def test7(a, b):
     return a + b
 
 
-@logit(save=True,load=True)
-def test8():
+@logit(save=True,load=True,ignore=False)
+def test8(a=1,b=2):
     import time
-    rs = 'aaaaaa'
+    rs = 'aaaaab'
     t1 = time.time()
     time.sleep(5)
     print(time.time()-t1)
@@ -85,5 +85,5 @@ if __name__ == "__main__":
     # a = test7(1,3)
     # print(a)
 
-    a = test8()
+    a = test8(a=3,b=4)
     print(a)

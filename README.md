@@ -48,7 +48,7 @@ To record log file easily,try this.
 
     from devTool import logit
 
-    @logit
+    @logit()
     def test4():
         x = 1 / 0
     
@@ -62,6 +62,39 @@ then DevLog/devlog.log will be created and log information will be added.
     File ".\testWrap.py", line 35, in test4
         x = 1 / 0
     ZeroDivisionError: division by zero
+
+@logit can add three params: save,load,ignore
+
+@save ,to record the function ,params and result to DevLog/devCache.dump
+
+@load, load result from DevLog/devCache.dump if the function costs much time. if the params are same to the stored params, then return the result. Otherwise, excute again.
+
+@ignore, force to execute the function 
+
+    @logit(save=True,load=True,ignore=False)
+    def test8(a=1,b=2):
+        import time
+        rs = 'aaaaab'
+        t1 = time.time()
+        time.sleep(5)
+        print(time.time()-t1)
+        return rs
+
+    if __name__ == "__main__":
+        a = test8(a=3,b=4)
+        print(a)
+
+
+first time:
+
+    (base) PS D:\dev-tool-for-python> python .\testWrap.py
+    5.01481556892395
+    aaaaab
+
+second time:
+
+    (base) PS D:\dev-tool-for-python> python .\testWrap.py
+    aaaaab
 
 
 ![linux](./static/devtool_linux.gif)
