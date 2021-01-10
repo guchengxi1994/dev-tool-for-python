@@ -15,6 +15,7 @@ import os
 import platform
 from functools import wraps
 import traceback
+import pickle
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
@@ -32,6 +33,7 @@ if not os.path.exists(BASE_DIR + os.sep + "DevLog"):
     os.mkdir(BASE_DIR + os.sep + "DevLog")
 
 LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
+Cache_path = BASE_DIR + os.sep + "DevLog" + os.sep + 'devCache.dump'
 
 rHandler = ConcurrentRotatingFileHandler(filename=LOG_PATH,
                                          maxBytes=5 * 1024 * 1024,
@@ -105,24 +107,54 @@ def infoDecorate(message: str = '', **infomation):
     return decorator
 
 
-def logit(func):
-    @setWrap
-    def execute(*args, **kwargs):
-        try:
-            func(*args, **kwargs)
-            logit_logger.info(func.__module__ + '.' + func.__name__ +
-                              ' finishes successfully.')
-        except Exception:
-            res = traceback.format_exc()
-            logit_logger.error(func.__module__ + '.' + func.__name__ + " " +
-                               res)
+def logit(**params):
+    def decorator(func):
+        @setWrap
+        def execute(*args, **kwargs):
+            flag = False
+            save = params.get('save', False)
+            load = params.get('load', False)
+            if load and os.path.exists(Cache_path):
+                with open(Cache_path, 'rb') as fi:
+                    d = pickle.load(fi)
+                    if func.__module__ + '.' + func.__name__ in d.keys():
+                        res = d[func.__module__ + '.' + func.__name__]
+                        return res
+                    else:
+                        flag = True
+            if not flag:
+                try:
+                    res = func(*args, **kwargs)
+                    logit_logger.info(func.__module__ + '.' + func.__name__ +
+                                      ' finishes successfully.')
+                    if save:
+                        d = dict()
+                        d[func.__module__ + '.' + func.__name__] = res
+                        # fan = FuncAndName(func.__module__ + '.' + func.__name__,None,'',res)
+                        if not os.path.exists(Cache_path):
+                            with open(Cache_path, 'wb') as fi:
+                                pickle.dump(d, fi)
+                        else:
+                            with open(Cache_path, 'rb') as fi:
+                                d = pickle.load(fi)
+                                d[func.__module__ + '.' + func.__name__] = res
+                                pickle.dump(d, fi)
 
-    return execute
+                except Exception:
+                    # res = traceback.format_exc()
+                    logit_logger.error(func.__module__ + '.' + func.__name__ +
+                                       " " + traceback.format_exc())
+                    res = None
+                return res
+
+        return execute
+
+    return decorator
 
 
 def Test(*pas, **params):
     def decorator(func):
-        @logit
+        @logit()
         def execute(*args, **kwargs):
             if len(pas) == len(func.__code__.co_varnames):
                 args = pas

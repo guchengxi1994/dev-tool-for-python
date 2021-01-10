@@ -30,7 +30,7 @@ def test3(aaaa='aaaa'):
     assert aaaa is int
 
 
-@logit
+@logit()
 def test4():
     x = 1 / 0
 
@@ -40,9 +40,25 @@ def test5():
     print('aaaaaaaaaaaaaa')
 
 
-@Test( a=43, b=12)
+@Test(a=43, b=12)
 def test6(a, b):
     print(a + b)
+
+
+@logit()
+def test7(a, b):
+    print(a + b)
+    return a + b
+
+
+@logit(save=True,load=True)
+def test8():
+    import time
+    rs = 'aaaaaa'
+    t1 = time.time()
+    time.sleep(5)
+    print(time.time()-t1)
+    return rs
 
 
 if __name__ == "__main__":
@@ -58,10 +74,16 @@ if __name__ == "__main__":
     # print(li)
 
     # print(func1.fc1_1.__module__)
-    test4()
+    # print(test4())
     # print (test4.__annotations__)
 
     # test5()
     # print(test5.__annotations__)
 
     # test6()
+
+    # a = test7(1,3)
+    # print(a)
+
+    a = test8()
+    print(a)

@@ -29,7 +29,9 @@
 
 # HOW TO USE.
 
-## 1. Down load this repo.
+## 1. Download this repo. run
+
+    pip install -r requestments.txt
 
 ## 2. Copy the "devtool" folder into your project.
 
