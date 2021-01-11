@@ -50,14 +50,15 @@ def test7(a, b):
     print(a + b)
     return a + b
 
+
 @recTime
-@logit(save=True,load=True,ignore=False)
-def test8(a=1,b=2):
+@logit(save=True, load=True, ignore=False)
+def test8(a=1, b=2):
     import time
     rs = 'aaaaab'
     t1 = time.time()
     time.sleep(5)
-    print(time.time()-t1)
+    print(time.time() - t1)
     return rs
 
 
@@ -89,3 +90,6 @@ if __name__ == "__main__":
     # print(a)
     test6(a=4, b=5)
 
+    test6(c=4, d=5)
+
+    test6(a=3, b=4)

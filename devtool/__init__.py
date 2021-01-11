@@ -187,28 +187,27 @@ def Test(*pas, **params):
     def decorator(func):
         @logit()
         def execute(*args, **kwargs):
-            print("Test")
-            # print(pas)
-            # if len(pas)>0:
-            #     if pas == args:
-            #         pas = tuple()
-            # pa = pas
-            # if pa == args:
-            #     pas = tuple()
-            # else:
-            #     pas = pa
-            # else:
-            #     pas = pas
             for k in params.keys():
                 if k in kwargs.keys():
                     params.clear()
                     break
             if len(pas) == len(func.__code__.co_varnames):
                 args = pas
+            # print('.....' + str(func.__code__.co_varnames))
             if len(params) > 0:
                 for k, v in params.items():
                     if k in func.__code__.co_varnames:
                         kwargs[k] = v
+            # print(kwargs)
+            if len(kwargs) > 0:
+                count = 0
+                for k in kwargs.keys():
+                    if k in func.__code__.co_varnames:
+                        count += 1
+                if not count == len(func.__code__.co_varnames):
+                    print("param number {} count not match {}.".format(
+                        count, len(func.__code__.co_varnames)))
+                    return
             return func(*args, **kwargs)
 
         return execute
