@@ -5,10 +5,10 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:33:57
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 17:24:59
+LastEditTime: 2021-01-11 19:27:59
 '''
 
-from devtool import Test, infoDecorate, logit, setWrap, testWrapper
+from devtool import Test, infoDecorate, logit, recTime, setWrap, testWrapper
 from devtool.tests.utils import func1
 
 
@@ -50,7 +50,7 @@ def test7(a, b):
     print(a + b)
     return a + b
 
-
+@recTime
 @logit(save=True,load=True,ignore=False)
 def test8(a=1,b=2):
     import time
@@ -85,5 +85,7 @@ if __name__ == "__main__":
     # a = test7(1,3)
     # print(a)
 
-    a = test8(a=3,b=4)
-    print(a)
+    # a = test8(a=3,b=4)
+    # print(a)
+    test6(a=4, b=5)
+

@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 17:24:29
+LastEditTime: 2021-01-11 19:32:46
 '''
 __version__ = '0.0.0'
 __appname__ = 'DevTool'
@@ -17,6 +17,7 @@ from functools import wraps
 import traceback
 import pickle
 import sys
+import time
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
@@ -141,7 +142,8 @@ def logit(**params):
                     d = pickle.load(fi)
                     if func.__module__ + '.' + func.__name__ in d.keys():
                         fan = d[func.__module__ + '.' + func.__name__]
-                        thisFan = FuncnameParamRes(func.__name__, [args, kwargs], None)
+                        thisFan = FuncnameParamRes(func.__name__,
+                                                   [args, kwargs], None)
                         if thisFan == fan:
                             # print('this == that')
                             return fan.res
@@ -185,6 +187,22 @@ def Test(*pas, **params):
     def decorator(func):
         @logit()
         def execute(*args, **kwargs):
+            print("Test")
+            # print(pas)
+            # if len(pas)>0:
+            #     if pas == args:
+            #         pas = tuple()
+            # pa = pas
+            # if pa == args:
+            #     pas = tuple()
+            # else:
+            #     pas = pa
+            # else:
+            #     pas = pas
+            for k in params.keys():
+                if k in kwargs.keys():
+                    params.clear()
+                    break
             if len(pas) == len(func.__code__.co_varnames):
                 args = pas
             if len(params) > 0:
@@ -196,3 +214,14 @@ def Test(*pas, **params):
         return execute
 
     return decorator
+
+
+def recTime(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        t1 = time.time()
+        res = func(*args, **kwargs)
+        print(time.time() - t1)
+        return res
+
+    return inner

@@ -5,7 +5,7 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-01-08 11:04:10
+ * @LastEditTime: 2021-01-11 17:21:05
 -->
 # dev-tool-for-python
  a small tool for python development
@@ -39,14 +39,14 @@
 
 ### 3.1 For logs filter.
 
-    from devTool import DevTool
+    from devtool.devTool import DevTool
     DevTool.logFilter(*kwds, **params)
 
 kws are the keywords to be searched,params include path,since and until under this version.
 
 To record log file easily,try this.
 
-    from devTool import logit
+    from devtool import logit
 
     @logit()
     def test4():
