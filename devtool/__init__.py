@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-11 19:32:46
+LastEditTime: 2021-01-12 10:51:08
 '''
 __version__ = '0.0.0'
 __appname__ = 'DevTool'
@@ -18,6 +18,7 @@ import traceback
 import pickle
 import sys
 import time
+import argparse
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
@@ -46,6 +47,27 @@ formatter = logging.Formatter(
 rHandler.setFormatter(formatter)
 
 logit_logger.addHandler(rHandler)
+
+
+class BaseParser(object):
+    def __init__(self, args: list, appname: str):
+        """
+        args type:list
+        arg type:tuple
+        arg example : ('-f','--force','force to show message even do not contain the module')
+        """
+        self.args = args
+        self.appname = __appname__
+        self.parser = argparse.ArgumentParser(
+            description='{} is a small tool for python development'.format(
+                self.appname))
+
+    def get_parser(self):
+        # pass
+        return self.parser
+
+    def add_parser(self, arg):
+        pass
 
 
 class FuncAndName:
@@ -215,12 +237,30 @@ def Test(*pas, **params):
     return decorator
 
 
-def recTime(func):
-    @wraps(func)
-    def inner(*args, **kwargs):
-        t1 = time.time()
-        res = func(*args, **kwargs)
-        print(time.time() - t1)
-        return res
+def recTime(times: int = 1):
+    if type(times) is not int:
+        times = 1
+    elif int(times) < 1:
+        times = 1
+    else:
+        pass
 
-    return inner
+    def decorator(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            record = 0
+            res = None
+            # print(times)
+            for _ in range(0, times):
+                t1 = time.time()
+                res = func(*args, **kwargs)
+                record += time.time() - t1
+            if times > 1:
+                print('average run time:' + str(record / times))
+            else:
+                print('run time:' + str(record / times))
+            return res
+
+        return inner
+
+    return decorator

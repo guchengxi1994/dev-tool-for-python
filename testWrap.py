@@ -5,11 +5,12 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:33:57
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-11 19:27:59
+LastEditTime: 2021-01-12 09:30:05
 '''
 
 from devtool import Test, infoDecorate, logit, recTime, setWrap, testWrapper
 from devtool.tests.utils import func1
+import time
 
 
 @setWrap
@@ -51,14 +52,14 @@ def test7(a, b):
     return a + b
 
 
-@recTime
-@logit(save=True, load=True, ignore=False)
+@recTime(5)
+@logit(save=True, load=False, ignore=False)
 def test8(a=1, b=2):
-    import time
+
     rs = 'aaaaab'
-    t1 = time.time()
+    # t1 = time.time()
     time.sleep(5)
-    print(time.time() - t1)
+    # print(time.time() - t1)
     return rs
 
 
@@ -88,8 +89,12 @@ if __name__ == "__main__":
 
     # a = test8(a=3,b=4)
     # print(a)
-    test6(a=4, b=5)
+    # test6(a=4, b=5)
 
-    test6(c=4, d=5)
+    # test6(c=4, d=5)
 
-    test6(a=3, b=4)
+    # test6(a=3, b=4)
+    t1 = time.time()
+    print(test8())
+
+    print('       '+str(time.time()-t1))
