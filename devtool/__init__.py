@@ -258,8 +258,64 @@ def recTime(times: int = 1):
             if times > 1:
                 print('average run time:' + str(record / times))
             else:
-                print('run time:' + str(record / times))
+                print('run time:' + str(record))
             return res
+
+        return inner
+
+    return decorator
+
+
+def afterExec(beep=False, string=''):
+    def decorator(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            res = func(*args, **kwargs)
+            if beep:
+                if __current_platform__ == 'Windows':
+                    import winsound
+                    try:
+                        winsound.Beep(523 * 2, 250)
+                        winsound.Beep(988, 300)
+                        winsound.Beep(523 * 2, 600)
+                        winsound.Beep(880, 600)
+                    except:
+                        pass
+                else:
+                    print('Not support on {}.'.format(__current_platform__))
+
+            if string != '':
+                print(string)
+
+            return res
+
+        return inner
+
+    return decorator
+
+
+def beforeExec(beep=False, string=''):
+    def decorator(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+
+            if beep:
+                if __current_platform__ == 'Windows':
+                    import winsound
+                    try:
+                        winsound.Beep(880, 250)
+                        winsound.Beep(523 * 2, 600)
+                        winsound.Beep(988, 300)
+                        winsound.Beep(523 * 2, 600)
+                    except:
+                        pass
+                else:
+                    print('Not support on {}.'.format(__current_platform__))
+
+            if string != '':
+                print(string)
+
+            return func(*args, **kwargs)
 
         return inner
 

@@ -13,7 +13,7 @@ import os
 
 from termcolor import colored
 
-from devtool import __current_platform__, setWrap
+from devtool import __current_platform__, do_nothing, infoDecorate, logit, setWrap
 from devtool.utils.common import (match_datetime, validate_date,
                                   validate_datetime)
 from devtool.utils.getFunctions import find_functions
@@ -30,6 +30,7 @@ class DevTool:
     currentModuleName = ''
 
     @classmethod
+    @logit()
     def exec(cls, moduleName=''):
         print('<================ Init... ================>')
         module = importlib.__import__(moduleName)
@@ -39,13 +40,23 @@ class DevTool:
         for i in member_list:
             try:
                 i.func.__call__()
-                if i.func.__annotations__.get('wrapped_cached', False):
+                if len(i.func.__annotations__) > 0:
+                    # print(True)
+                    val = map(lambda x: str(x),
+                              list(i.func.__annotations__.values()))
+                    # print(val)
+                    i.info = ','.join(val)
+                    # print(i.info)
                     cls.storage.append(i)
+                # if i.func.__annotations__.get('wrapped_cached', False):
+                #     cls.storage.append(i)
             except:
                 continue
         print('<================ finish ================>')
         cls.currentModulePath = modulePath
         cls.currentModuleName = moduleName
+        # print(cls.storage)
+        return cls.storage
 
     @classmethod
     def grep(cls, moduleName: str, grepType, *kwds):
@@ -55,14 +66,35 @@ class DevTool:
         """
         if len(cls.storage) == 0:
             print(
-                'Nothing found. Plz run DevTool.go() first or just there is nothing to find.'
+                'Nothing found. Plz run DevTool.exec() first or just there is nothing to find.'
             )
+            return
         else:
+            if moduleName != 'this':
+                thisStorage = cls.exec(moduleName)
+            else:
+                thisStorage = cls.storage
             if grepType not in ['and', 'or']:
                 print(
                     "grepType should be a str in ['and','or'],  but got {}, use 'or' instead."
                     .format(grepType))
                 grepType = 'or'
+
+            remainedRes = []
+            if grepType == 'or':
+                for i in thisStorage:
+                    for j in kwds:
+                        if j in i.info:
+                            remainedRes.append(i)
+
+            if grepType == 'and':
+                for i in thisStorage:
+                    for j in kwds:
+                        if not j in i.info:
+                            break
+                        remainedRes.append(i)
+            cls.storage = remainedRes
+            return remainedRes
 
     @classmethod
     def tree(cls, moduleName):
@@ -166,6 +198,7 @@ class DevTool:
                     return
 
     @classmethod
+    @infoDecorate(message='this function is not as good as i supposed.')
     def treeWithState(cls, moduleName):
         if cls.currentModulePath == '':
             module = importlib.__import__(moduleName)
@@ -196,6 +229,7 @@ class DevTool:
                     (root + os.sep + f).replace(modulePath,
                                                 '').replace(os.sep, '.'))
                 if not f.endswith('.pyc'):
+                    lastText = ''
                     if len(cls.storage) > 0:
                         for i in cls.storage:
                             tmpModu = i.func.__module__
@@ -212,8 +246,16 @@ class DevTool:
                                         str(len(i.func.__annotations__))),
                                                    'red',
                                                    attrs=['reverse', 'blink'])
-                                print(text)
+                                print(text) if lastText != text else do_nothing
+                                lastText = text
                             else:
-                                print('{}{}'.format(file_indent, f))
+                                print('{}{}'.format(
+                                    file_indent,
+                                    f)) if lastText != '{}{}'.format(
+                                        file_indent, f) else do_nothing
+                                lastText = '{}{}'.format(file_indent, f)
                     else:
-                        print('{}{}'.format(file_indent, f))
+                        print('{}{}'.format(file_indent,
+                                            f)) if lastText != '{}{}'.format(
+                                                file_indent, f) else do_nothing
+                        lastText = '{}{}'.format(file_indent, f)

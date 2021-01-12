@@ -8,7 +8,7 @@ LastEditors: xiaoshuyui
 LastEditTime: 2021-01-12 09:30:05
 '''
 
-from devtool import Test, infoDecorate, logit, recTime, setWrap, testWrapper
+from devtool import Test, afterExec, beforeExec, infoDecorate, logit, recTime, setWrap, testWrapper
 from devtool.tests.utils import func1
 import time
 
@@ -63,6 +63,14 @@ def test8(a=1, b=2):
     return rs
 
 
+@beforeExec(beep=True)
+@afterExec(beep=True)
+def test9(a, b):
+    print(a + b)
+    time.sleep(1)
+    return a + b
+
+
 if __name__ == "__main__":
     # try:
     #     # test3()
@@ -94,7 +102,9 @@ if __name__ == "__main__":
     # test6(c=4, d=5)
 
     # test6(a=3, b=4)
-    t1 = time.time()
-    print(test8())
+    # t1 = time.time()
+    # print(test8())
 
-    print('       '+str(time.time()-t1))
+    # print('       '+str(time.time()-t1))
+
+    test9(1,3)
