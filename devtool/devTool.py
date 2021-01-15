@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:26:44
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-15 14:05:31
+LastEditTime: 2021-01-15 14:43:03
 '''
 import datetime
 import importlib
@@ -24,7 +24,10 @@ from devtool.utils.getModules import find_modules
 BASE_DIR = os.path.abspath(os.curdir)
 LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
 
-yamlFilePath = BASE_DIR + os.sep + 'devtool' + os.sep + 'style.yaml'
+abs_file = __file__
+p, _ = os.path.split(abs_file)
+yamlFilePath = p + os.sep + 'style.yaml'
+# print(yamlFilePath)
 
 
 class DevTool:
@@ -261,7 +264,7 @@ class DevTool:
 
     @staticmethod
     @logit()
-    def initProject(projectName, path='', style='MINE',tree=False):
+    def initProject(projectName, path='', style='MINE', tree=False):
         if path == '':
             print(
                 'This script needs a parameter "path",but got "",using {} instead.'
@@ -308,7 +311,8 @@ class DevTool:
                 else:
                     tmp = os.path.basename(root)
                     if tmp != '__pycache__':
-                        print('{}{}'.format(dir_indent, os.path.basename(root)))
+                        print('{}{}'.format(dir_indent,
+                                            os.path.basename(root)))
                     del tmp
                 for f in files:
                     if not f.endswith('.pyc'):
