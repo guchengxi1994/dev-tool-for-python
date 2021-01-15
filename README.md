@@ -5,7 +5,7 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-01-11 17:21:05
+ * @LastEditTime: 2021-01-15 14:12:34
 -->
 # dev-tool-for-python
  a small tool for python development
@@ -98,4 +98,37 @@ second time:
 
 
 ![linux](./static/devtool_linux.gif)
+
+### 3.2 init a new python project
+
+    from devtool.devTool import DevTool
+
+    if __name__ == "__main__":
+        DevTool.initProject('Test')
+
+![initproject](./static/devtool_init_project.gif)
+
+If 'DevTool.initProject' got a param 'tree=True', then
+
+    This script needs a parameter "path",but got "",using D:\testALg\mask2json\devTool\dev-tool-for-python\Test instead.
+    Init finishes.
+    .
+    |-- main.py
+    |-- static
+    |-- tests
+    |-- utils
+    |   |-- __init__.py
+
+The structure of project is stored in [style.yaml](./devtool/style.yaml).
+
+    MINE:
+        scripts:
+            main : root/main.py
+            utils_init : root/utils/__init__.py
+        folders:
+            static : root/static
+            utils : root/utils
+            tests : root/tests
+
+And "MINE" is my style. :)
 

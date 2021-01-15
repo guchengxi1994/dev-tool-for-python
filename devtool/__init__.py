@@ -5,9 +5,9 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-12 10:51:08
+LastEditTime: 2021-01-15 14:13:56
 '''
-__version__ = '0.0.0'
+__version__ = '0.0.1'
 __appname__ = 'DevTool'
 
 import logging

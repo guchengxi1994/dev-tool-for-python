@@ -5,23 +5,26 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:26:44
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 16:56:29
+LastEditTime: 2021-01-15 14:05:31
 '''
 import datetime
 import importlib
 import os
 
+import yaml
 from termcolor import colored
 
-from devtool import __current_platform__, do_nothing, infoDecorate, logit, setWrap
+from devtool import (__current_platform__, do_nothing, infoDecorate, logit,
+                     logit_logger, setWrap)
 from devtool.utils.common import (match_datetime, validate_date,
                                   validate_datetime)
 from devtool.utils.getFunctions import find_functions
 from devtool.utils.getModules import find_modules
-from devtool import logit_logger
 
 BASE_DIR = os.path.abspath(os.curdir)
 LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
+
+yamlFilePath = BASE_DIR + os.sep + 'devtool' + os.sep + 'style.yaml'
 
 
 class DevTool:
@@ -209,10 +212,6 @@ class DevTool:
         if len(cls.storage) == 0:
             print('Plz run DevTool.exec() first.')
 
-        # for i in cls.storage:
-        #     print(i.funcName)
-        #     print(i.func.__module__)
-
         for root, _, files in os.walk(modulePath):
             level = root.replace(modulePath, '').count(os.sep)
             dir_indent = "|   " * (level - 1) + "|-- "
@@ -259,3 +258,58 @@ class DevTool:
                                             f)) if lastText != '{}{}'.format(
                                                 file_indent, f) else do_nothing
                         lastText = '{}{}'.format(file_indent, f)
+
+    @staticmethod
+    @logit()
+    def initProject(projectName, path='', style='MINE',tree=False):
+        if path == '':
+            print(
+                'This script needs a parameter "path",but got "",using {} instead.'
+                .format(BASE_DIR + os.sep + projectName))
+            projectPath = BASE_DIR + os.sep + projectName
+        else:
+            projectPath = path + os.sep + projectName
+
+        if not os.path.exists(projectPath):
+            os.mkdir(projectPath)
+
+        # main.py
+        f = open(yamlFilePath, 'r', encoding='utf-8', errors='ignore')
+        cont = f.read()
+
+        x = yaml.load(cont, Loader=yaml.BaseLoader)
+
+        sty = x[style]
+        scripts = sty['scripts']
+        folders = sty['folders']
+        # print(scripts);print(folders)
+        for v in folders.values():
+            if not os.path.exists(v.replace('root', projectPath)):
+                os.mkdir(v.replace('root', projectPath))
+                # print(v.replace('root', projectPath))
+        for v in scripts.values():
+            if not os.path.exists(v.replace('root', projectPath)):
+                # os.mkdir(v.replace('root', projectPath))
+                fp = open(v.replace('root', projectPath),
+                          'w+',
+                          encoding='utf-8')
+                fp.close()
+
+        f.close()
+        print("Init finishes.")
+
+        if tree:
+            for root, _, files in os.walk(projectPath):
+                level = root.replace(projectPath, '').count(os.sep)
+                dir_indent = "|   " * (level - 1) + "|-- "
+                file_indent = "|   " * level + "|-- "
+                if not level:
+                    print('.')
+                else:
+                    tmp = os.path.basename(root)
+                    if tmp != '__pycache__':
+                        print('{}{}'.format(dir_indent, os.path.basename(root)))
+                    del tmp
+                for f in files:
+                    if not f.endswith('.pyc'):
+                        print('{}{}'.format(file_indent, f))

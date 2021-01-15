@@ -8,6 +8,7 @@ install:
 
 script:
   - python testDevTool.py
+  - python testNewProject.py
 
 notifications:
   on_success: always
