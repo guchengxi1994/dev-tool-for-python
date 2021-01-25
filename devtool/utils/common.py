@@ -5,10 +5,34 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-08 09:27:04
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-08 10:08:52
+LastEditTime: 2021-01-25 19:00:49
 '''
+import os
 import re
 import datetime
+import time
+is_psutil_installed = False
+is_pynvml_installed = False
+
+try:
+    import psutil
+    is_psutil_installed = True
+except:
+    pass
+
+try:
+    import pynvml
+    is_pynvml_installed = True
+except:
+    pass
+
+__DEFAULT_SIZE__ = 1024 * 1024
+
+memorys = []
+memory_percents = []
+cpu_percents = []
+useds = []
+
 
 def match_datetime(text):
     '''正则表达式提取文本所有日期+时间
@@ -35,7 +59,8 @@ def validate_datetime(text):
     False
     '''
     try:
-        if text != datetime.datetime.strptime(text, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S'):
+        if text != datetime.datetime.strptime(
+                text, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M:%S'):
             raise ValueError
         return True
     except ValueError:
@@ -53,8 +78,76 @@ def validate_date(text):
     False
     '''
     try:
-        if text != datetime.datetime.strptime(text, '%Y-%m-%d').strftime('%Y-%m-%d'):
+        if text != datetime.datetime.strptime(text,
+                                              '%Y-%m-%d').strftime('%Y-%m-%d'):
             raise ValueError
         return True
     except ValueError:
         return False
+
+
+def showPsInfo_before():
+    if not is_psutil_installed:
+        print('Module "psutil" is not installed. Plz install it first.')
+        return
+    currentPid = os.getpid()
+    pids = psutil.pids()  # for multi processes maybe
+    return currentPid, pids
+
+
+def solution2(beforePids: tuple, gpu=False,return_dict=dict()):
+    global memorys, memory_percents, cpu_percents, useds
+    currentPid = beforePids[0]
+    p = psutil.Process(currentPid)
+    print("memory : {}, memory_persent : {}, cpu_percent : {}".format(
+        str(
+            int(psutil.virtual_memory()[0] * p.memory_percent() /
+                (100 * __DEFAULT_SIZE__))) + "MB",
+        str(round(p.memory_percent(), 3)) + "%", p.cpu_percent()))
+    memorys.append(int(psutil.virtual_memory()[0] * p.memory_percent() /
+                (100 * __DEFAULT_SIZE__)))
+    memory_percents.append(round(p.memory_percent(), 3))
+    cpu_percents.append(p.cpu_percent())
+    return_dict['memorys'] = memorys     # maybe wrong 
+    return_dict['memory_percents'] = memory_percents
+    return_dict['cpu_percents'] = cpu_percents
+    if gpu:
+        if not is_pynvml_installed:
+            print('Module "pynvml" is not installed. Plz install it first.')
+        else:
+            try:
+                pynvml.nvmlInit()
+                driver = pynvml.nvmlSystemGetDriverVersion()
+                gpunum = pynvml.nvmlDeviceGetCount()
+                handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+                device = pynvml.nvmlDeviceGetName(handle)
+                info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+                total = int(info.total / __DEFAULT_SIZE__)
+                used = int(info.used / __DEFAULT_SIZE__)
+                pynvml.nvmlShutdown()
+                print(
+                    "driver:{}, gpunum:{}, device:{}, total:{}MB, used:{}MB .".
+                    format(driver.decode(), gpunum, device.decode(), total,
+                           used))
+                useds.append(used)
+                return_dict['useds'] = useds    # gpu used not OK
+            except:
+                print('"pynvml" not working')
+    time.sleep(1)
+
+
+def showPsInfo_after(beforePids: tuple,
+                     psname='python',
+                     gpu=False,
+                     repeat=True,
+                     return_dict=dict()):
+    if not is_psutil_installed:
+        print('Module "psutil" is not installed. Plz install it first.')
+        return
+
+    if not repeat:
+        solution2(beforePids,gpu,return_dict)
+    else:
+        while 1 == 1:
+            solution2(beforePids, gpu,return_dict)
+        

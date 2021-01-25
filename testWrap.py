@@ -5,10 +5,10 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:33:57
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-12 09:30:05
+LastEditTime: 2021-01-25 18:58:19
 '''
 
-from devtool import Test, afterExec, beforeExec, infoDecorate, logit, recTime, setWrap, testWrapper
+from devtool import Test, afterExec, beforeExec, infoDecorate, logit, recTime, running, setWrap, testWrapper
 from devtool.tests.utils import func1
 import time
 
@@ -71,6 +71,19 @@ def test9(a, b):
     return a + b
 
 
+@running(gpu=False)
+def test10():
+    # while 1 == 1:
+    #     print(test10.__name__ + ' running')
+    #     time.sleep(3)
+
+    i = 0
+    while i <= 2:
+        print(test10.__name__ + ' running')
+        time.sleep(3)
+        i += 1
+
+
 if __name__ == "__main__":
     # try:
     #     # test3()
@@ -107,4 +120,6 @@ if __name__ == "__main__":
 
     # print('       '+str(time.time()-t1))
 
-    test9(1,3)
+    # test9(1,3)
+
+    test10()

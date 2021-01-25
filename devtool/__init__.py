@@ -5,11 +5,12 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-15 14:46:42
+LastEditTime: 2021-01-25 19:06:56
 '''
-__version__ = '0.0.1a'
+__version__ = '0.0.2'
 __appname__ = 'DevTool'
 
+from devtool.utils.common import showPsInfo_after, showPsInfo_before
 import logging
 import os
 import platform
@@ -19,6 +20,8 @@ import pickle
 import sys
 import time
 import argparse
+import multiprocessing
+from multiprocessing import Manager
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
@@ -316,6 +319,48 @@ def beforeExec(beep=False, string=''):
                 print(string)
 
             return func(*args, **kwargs)
+
+        return inner
+
+    return decorator
+
+
+def list_average(li: list):
+    total = 0
+    for ele in range(0, len(li)):
+        total = total + li[ele]
+    return total / len(li) if len(li) > 0 else 0
+
+
+def running(psname='python', gpu=False, repeat=True):
+    def decorator(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            pids = showPsInfo_before()
+            manager = Manager()
+            return_dict = manager.dict()
+            p = multiprocessing.Process(target=showPsInfo_after,
+                                        args=(pids, psname, gpu, repeat,
+                                              return_dict))
+            p.start()
+            startTime = time.time()
+            result = func(*args, **kwargs)
+            spendTime = time.time() - startTime
+            p.terminate()
+            print("""
+                                        Total
+            =============================================================
+            Used time:                 {} s,
+            Average memory:            {} MB,
+            Average memory percent:    {} %,
+            Average cpu percent:       {} % ,
+            Average used gpu:          {} MB.
+            =============================================================  
+            """.format(round(spendTime,3), list_average(return_dict['memorys']),
+                       list_average(return_dict['memory_percents']),
+                       list_average(return_dict['cpu_percents']),
+                       list_average(return_dict.get('useds',[0,]))))
+            return result
 
         return inner
 

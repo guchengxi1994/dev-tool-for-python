@@ -5,7 +5,7 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-01-15 14:12:34
+ * @LastEditTime: 2021-01-25 19:06:30
 -->
 # dev-tool-for-python
  a small tool for python development
@@ -131,4 +131,37 @@ The structure of project is stored in [style.yaml](./devtool/style.yaml).
             tests : root/tests
 
 And "MINE" is my style. :)
+
+# Change log
+
+### 2021.1.25 
+
+1.add decorator "running", see  [here](./devtool/__init__.py)
+
+To use this function, try [testWrap.test10](./testWrap.py), effect:
+
+    (base) PS D:\testALg\mask2json\devTool\dev-tool-for-python> python .\testWrap.py
+    test10 running
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    test10 running
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    test10 running
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+    memory : 21MB, memory_persent : 0.264%, cpu_percent : 0.0
+
+                                            Total
+                =============================================================
+                Used time:                 9.000941753387451 s,
+                Average memory:            21.0 MB,
+                Average memory percent:    0.264 %,
+                Average cpu percent:       0.0 % ,
+                Average used gpu:          0.0 MB.
+                =============================================================
+
+
 
