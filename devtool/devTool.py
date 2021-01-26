@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:26:44
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-15 14:43:03
+LastEditTime: 2021-01-26 13:29:49
 '''
 import datetime
 import importlib
@@ -20,6 +20,8 @@ from devtool.utils.common import (match_datetime, validate_date,
                                   validate_datetime)
 from devtool.utils.getFunctions import find_functions
 from devtool.utils.getModules import find_modules
+from devtool.utils.pythonSearch import searchScript
+from devtool.utils.pythonShow import showScript
 
 BASE_DIR = os.path.abspath(os.curdir)
 LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
@@ -27,7 +29,6 @@ LOG_PATH = BASE_DIR + os.sep + "DevLog" + os.sep + 'devlog.log'
 abs_file = __file__
 p, _ = os.path.split(abs_file)
 yamlFilePath = p + os.sep + 'style.yaml'
-# print(yamlFilePath)
 
 
 class DevTool:
@@ -317,3 +318,12 @@ class DevTool:
                 for f in files:
                     if not f.endswith('.pyc'):
                         print('{}{}'.format(file_indent, f))
+
+    @staticmethod
+    def show(name: str):
+        showScript(name)
+
+    @staticmethod
+    def search(name: str):
+        moduleList = name.split(" ")
+        searchScript(moduleList)

@@ -4,3 +4,5 @@ concurrent_log_handler==0.9.16
 PyYAML==5.1.1
 psutil
 nvidia-ml-py3
+pyquery
+smoothnlp

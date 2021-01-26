@@ -5,7 +5,7 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-01-25 19:06:30
+ * @LastEditTime: 2021-01-26 14:44:57
 -->
 # dev-tool-for-python
  a small tool for python development
@@ -134,11 +134,129 @@ And "MINE" is my style. :)
 
 # Change log
 
+### 2021.1.26
+
+1. merge some usage from ['show-and-search'](https://github.com/guchengxi1994/show-and-search)
+
+2. add function [plot](./devtool/__init__.py)
+
+To use this decorator, try [testPlot.py](./testPlot.py), effect:
+
+    @traceplot(False)
+    def add1(a, b):
+        c = 3
+        d = 4
+        e = c + d
+        return a + b + e
+
+    @traceplot()
+    def add2(a, b):
+        c = 3
+        d = 4
+        e = c + d
+        return a + b + e
+
+    if __name__ == "__main__":
+        add1(3,4)
+        add2(3,4)
+
+
+    (base) PS D:\testALg\mask2json\devTool\dev-tool-for-python> & D:/anaconda/python.exe d:/testALg/mask2json/devTool/dev-tool-for-python/testPlot.py
+    call __main__.add1:35 {'a': 3, 'b': 4} None
+    line __main__.add1:37 {'a': 3, 'b': 4} None
+    line __main__.add1:38 {'a': 3, 'b': 4, 'c': 3} None
+    line __main__.add1:39 {'a': 3, 'b': 4, 'c': 3, 'd': 4} None
+    line __main__.add1:40 {'a': 3, 'b': 4, 'c': 3, 'd': 4, 'e': 7} None
+    return __main__.add1:40 {'a': 3, 'b': 4, 'c': 3, 'd': 4, 'e': 7} 14
+
+            section1
+     _____________________
+    |        call         |
+    |      __main__       |
+    |       add2:42       |
+    |        None         |
+    |_____________________|
+
+                |
+                |
+                |
+                |
+                V
+
+            section2
+     _____________________
+    |        line         |
+    |      __main__       |
+    |       add2:44       |
+    |        None         |
+    |_____________________|
+
+                |
+                |
+                |
+                |
+                V
+
+            section3
+     _____________________
+    |        line         |
+    |      __main__       |
+    |       add2:45       |
+    |        None         |
+    |_____________________|
+
+                |
+                |
+                |
+                |
+                V
+
+            section4
+     _____________________
+    |        line         |
+    |      __main__       |
+    |       add2:46       |
+    |        None         |
+    |_____________________|
+
+                |
+                |
+                |
+                |
+                V
+
+            section5
+     _____________________
+    |        line         |
+    |      __main__       |
+    |       add2:47       |
+    |        None         |
+    |_____________________|
+
+                |
+                |
+                |
+                |
+                V
+
+            section6
+     _____________________
+    |       return        |
+    |      __main__       |
+    |       add2:47       |
+    |         14          |
+    |_____________________|
+
+                |
+                |
+                O
+
+
 ### 2021.1.25 
 
-1.add decorator "running", see  [here](./devtool/__init__.py)
+1. add decorator "running", see  [here](./devtool/__init__.py)
 
-To use this function, try [testWrap.test10](./testWrap.py), effect:
+To use this decorator, try [testWrap.test10](./testWrap.py), effect:
 
     (base) PS D:\testALg\mask2json\devTool\dev-tool-for-python> python .\testWrap.py
     test10 running

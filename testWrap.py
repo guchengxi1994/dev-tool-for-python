@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:33:57
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-25 18:58:19
+LastEditTime: 2021-01-26 08:48:21
 '''
 
 from devtool import Test, afterExec, beforeExec, infoDecorate, logit, recTime, running, setWrap, testWrapper
@@ -71,7 +71,7 @@ def test9(a, b):
     return a + b
 
 
-@running(gpu=False)
+@running(gpu=True)
 def test10():
     # while 1 == 1:
     #     print(test10.__name__ + ' running')
@@ -80,7 +80,16 @@ def test10():
     i = 0
     while i <= 2:
         print(test10.__name__ + ' running')
-        time.sleep(3)
+        time.sleep(1.5)
+        i += 1
+
+
+@running(mThres=5)
+def test11():
+    i = 0
+    while i <= 2:
+        print(test11.__name__ + ' running')
+        time.sleep(1.5)
         i += 1
 
 
@@ -123,3 +132,5 @@ if __name__ == "__main__":
     # test9(1,3)
 
     test10()
+
+    test11()

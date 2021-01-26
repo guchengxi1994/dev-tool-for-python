@@ -9,6 +9,7 @@ install:
 script:
   - python testDevTool.py
   - python testNewProject.py
+  - python testWrap.py
 
 notifications:
   on_success: always

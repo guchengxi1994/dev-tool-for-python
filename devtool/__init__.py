@@ -5,25 +5,28 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-25 19:06:56
+LastEditTime: 2021-01-26 14:40:01
 '''
 __version__ = '0.0.2'
 __appname__ = 'DevTool'
 
-from devtool.utils.common import showPsInfo_after, showPsInfo_before
+import argparse
+import inspect
 import logging
+import multiprocessing
 import os
-import platform
-from functools import wraps
-import traceback
 import pickle
+import platform
 import sys
 import time
-import argparse
-import multiprocessing
+import traceback
+from functools import wraps
 from multiprocessing import Manager
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
+
+from devtool.utils.common import plotBeautify, showPsInfo_after, showPsInfo_before
+from devtool.utils import __arrow__, __block__, __end__
 
 __current_platform__ = platform.system()
 
@@ -50,6 +53,50 @@ formatter = logging.Formatter(
 rHandler.setFormatter(formatter)
 
 logit_logger.addHandler(rHandler)
+
+
+class Tracer:
+    plot = True
+    section = 0
+
+    @classmethod
+    def setPlot(cls, plot):
+        cls.plot = plot
+
+    @classmethod
+    def dump(cls, frame, event, arg):
+        code = frame.f_code
+        module = inspect.getmodule(code)
+        module_name = ""
+        module_path = ""
+        if module:
+            module_path = module.__file__
+            module_name = module.__name__
+        # print(cls.plot)
+        if not cls.plot:
+            print(
+                event, module_name + '.' + str(code.co_name) + ":" +
+                str(frame.f_lineno), frame.f_locals, arg)
+        else:
+            cls.section += 1
+            p1 = plotBeautify(str(event))
+            p2 = plotBeautify(str(module_name))
+            p3 = plotBeautify(
+                str(str(code.co_name) + ":" + str(frame.f_lineno)))
+            p4 = plotBeautify(str(arg))
+            print(__block__.format(cls.section, p1, p2, p3, p4))
+            print(__arrow__) if str(event) != 'return' else print(__end__)
+
+    @classmethod
+    def trace(cls, frame, event, arg):
+        cls.dump(frame, event, arg)
+        return cls.trace
+
+    @classmethod
+    def collect(cls, func, *args, **kwargs):
+        sys.settrace(cls.trace)
+        func(*args, **kwargs)
+        sys.settrace(None)
 
 
 class BaseParser(object):
@@ -332,7 +379,7 @@ def list_average(li: list):
     return total / len(li) if len(li) > 0 else 0
 
 
-def running(psname='python', gpu=False, repeat=True):
+def running(psname='python', gpu=False, repeat=True, mThres=float('inf')):
     def decorator(func):
         @wraps(func)
         def inner(*args, **kwargs):
@@ -341,7 +388,7 @@ def running(psname='python', gpu=False, repeat=True):
             return_dict = manager.dict()
             p = multiprocessing.Process(target=showPsInfo_after,
                                         args=(pids, psname, gpu, repeat,
-                                              return_dict))
+                                              return_dict, mThres))
             p.start()
             startTime = time.time()
             result = func(*args, **kwargs)
@@ -356,11 +403,27 @@ def running(psname='python', gpu=False, repeat=True):
             Average cpu percent:       {} % ,
             Average used gpu:          {} MB.
             =============================================================  
-            """.format(round(spendTime,3), list_average(return_dict['memorys']),
+            """.format(round(spendTime, 3),
+                       list_average(return_dict['memorys']),
                        list_average(return_dict['memory_percents']),
                        list_average(return_dict['cpu_percents']),
-                       list_average(return_dict.get('useds',[0,]))))
+                       list_average(return_dict.get('useds', [
+                           0,
+                       ]))))
             return result
+
+        return inner
+
+    return decorator
+
+
+def traceplot(plot=True):
+    def decorator(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            t = Tracer()
+            t.setPlot(plot)
+            t.collect(func, *args, **kwargs)
 
         return inner
 

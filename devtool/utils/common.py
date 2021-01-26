@@ -5,12 +5,15 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-08 09:27:04
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-25 19:00:49
+LastEditTime: 2021-01-26 14:28:17
 '''
+import datetime
 import os
 import re
-import datetime
 import time
+
+from devtool.utils.devtool_exceptions import MemoryOutOfThresException
+
 is_psutil_installed = False
 is_pynvml_installed = False
 
@@ -95,22 +98,35 @@ def showPsInfo_before():
     return currentPid, pids
 
 
-def solution2(beforePids: tuple, gpu=False,return_dict=dict()):
+def situation(beforePids: tuple,
+              gpu=False,
+              return_dict=dict(),
+              mThres=float('inf')):
     global memorys, memory_percents, cpu_percents, useds
     currentPid = beforePids[0]
+    # print(currentPid)
+    # print(os.getpid())
     p = psutil.Process(currentPid)
+    usedMemory = int(psutil.virtual_memory()[0] * p.memory_percent() /
+                     (100 * __DEFAULT_SIZE__))
     print("memory : {}, memory_persent : {}, cpu_percent : {}".format(
-        str(
-            int(psutil.virtual_memory()[0] * p.memory_percent() /
-                (100 * __DEFAULT_SIZE__))) + "MB",
+        str(usedMemory) + "MB",
         str(round(p.memory_percent(), 3)) + "%", p.cpu_percent()))
-    memorys.append(int(psutil.virtual_memory()[0] * p.memory_percent() /
-                (100 * __DEFAULT_SIZE__)))
+    memorys.append(usedMemory)
     memory_percents.append(round(p.memory_percent(), 3))
     cpu_percents.append(p.cpu_percent())
-    return_dict['memorys'] = memorys     # maybe wrong 
+    return_dict['memorys'] = memorys
     return_dict['memory_percents'] = memory_percents
     return_dict['cpu_percents'] = cpu_percents
+
+    if usedMemory > mThres:
+        print(
+            "This function out of memory with threshold {} MB, but got {} MB during runtime."
+            .format(mThres, usedMemory))
+        mp = psutil.Process(os.getpid())
+        p.kill()
+        mp.kill()
+
     if gpu:
         if not is_pynvml_installed:
             print('Module "pynvml" is not installed. Plz install it first.')
@@ -130,7 +146,7 @@ def solution2(beforePids: tuple, gpu=False,return_dict=dict()):
                     format(driver.decode(), gpunum, device.decode(), total,
                            used))
                 useds.append(used)
-                return_dict['useds'] = useds    # gpu used not OK
+                return_dict['useds'] = useds  # gpu used not OK
             except:
                 print('"pynvml" not working')
     time.sleep(1)
@@ -140,14 +156,32 @@ def showPsInfo_after(beforePids: tuple,
                      psname='python',
                      gpu=False,
                      repeat=True,
-                     return_dict=dict()):
+                     return_dict=dict(),
+                     mThres=float('inf')):
+    """mThres : memory thres
+    """
     if not is_psutil_installed:
         print('Module "psutil" is not installed. Plz install it first.')
         return
 
     if not repeat:
-        solution2(beforePids,gpu,return_dict)
+        situation(beforePids, gpu, return_dict, mThres)
     else:
         while 1 == 1:
-            solution2(beforePids, gpu,return_dict)
-        
+            situation(beforePids, gpu, return_dict, mThres)
+
+
+def plotBeautify(code: str, defaultLength: int = 22):
+    assert type(
+        code) is str, "param 'code' must be a str, while got a {}".format(
+            type(code))
+    if len(code) >= defaultLength:
+        return code
+    else:
+        s = len(str(code))
+        if s%2 == 0:
+            return int(defaultLength / 2 - 0.5 * s - 1) * ' ' + str(
+                code) + int(defaultLength / 2 - 0.5 * s) * ' '
+        else:
+            return int(defaultLength / 2 - 0.5 * s) * ' ' + str(
+                code) + int(defaultLength / 2 - 0.5 * s) * ' '
