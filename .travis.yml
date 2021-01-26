@@ -10,6 +10,7 @@ script:
   - python testDevTool.py
   - python testNewProject.py
   - python testWrap.py
+  - python testPlot.py
 
 notifications:
   on_success: always

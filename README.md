@@ -5,7 +5,7 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-01-26 14:44:57
+ * @LastEditTime: 2021-01-26 14:57:45
 -->
 # dev-tool-for-python
  a small tool for python development
@@ -251,6 +251,20 @@ To use this decorator, try [testPlot.py](./testPlot.py), effect:
                 |
                 O
 
+3. running function with a int number as the memory threshold.
+
+        @running(mThres=5)
+        def test11():
+            i = 0
+            while i <= 2:
+                print(test11.__name__ + ' running')
+                time.sleep(1.5)
+                i += 1
+
+    test11 running
+    memory : 21MB, memory_persent : 0.261%, cpu_percent : 0.0
+    
+    This function out of memory with threshold 5 MB, but got 21 MB during runtime.
 
 ### 2021.1.25 
 
