@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-26 14:40:01
+LastEditTime: 2021-01-26 15:03:58
 '''
 __version__ = '0.0.2'
 __appname__ = 'DevTool'
@@ -26,7 +26,7 @@ from multiprocessing import Manager
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
 from devtool.utils.common import plotBeautify, showPsInfo_after, showPsInfo_before
-from devtool.utils import __arrow__, __block__, __end__
+from devtool.utils import __arrow__, __block__, __end__,__start__
 
 __current_platform__ = platform.system()
 
@@ -84,6 +84,7 @@ class Tracer:
             p3 = plotBeautify(
                 str(str(code.co_name) + ":" + str(frame.f_lineno)))
             p4 = plotBeautify(str(arg))
+            print(__start__) if str(event) == 'call' else do_nothing()
             print(__block__.format(cls.section, p1, p2, p3, p4))
             print(__arrow__) if str(event) != 'return' else print(__end__)
 
