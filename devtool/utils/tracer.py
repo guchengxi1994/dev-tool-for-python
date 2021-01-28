@@ -3,52 +3,51 @@ lanhuage: python
 Descripttion: 
 version: beta
 Author: xiaoshuyui
-Date: 2021-01-26 10:54:43
+Date: 2021-01-28 08:47:04
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-28 11:16:02
+LastEditTime: 2021-01-28 11:25:43
 '''
-import sys
+
 import inspect
+import sys
+from devtool.utils.common import plotBeautify
+from devtool.utils import __start__, __block__, __arrow__, __end__
 
 
-class Te:
-    ...
+def do_nothing():
+    pass
 
 
-def addSub(c, d):
-    t = Te()
-    setattr(t, 'name', 'xiaoming')
-    print(t.name)
-    return c + d
-
-
-def add(a, b):
-    c = 3
-    d = 4
-    return a + b + addSub(c, d)
-
-
-class Tracer:
+class GraphTracer:
     plot = False
     section = 0
+
+    @classmethod
+    def setPlot(cls, plot):
+        cls.plot = plot
 
     @classmethod
     def dump(cls, frame, event, arg):
         code = frame.f_code
         module = inspect.getmodule(code)
         module_name = ""
-        module_path = ""
         if module:
-            module_path = module.__file__
             module_name = module.__name__
+
         if not cls.plot:
             print(
                 event, module_name + '.' + str(code.co_name) + ":" +
                 str(frame.f_lineno), frame.f_locals, arg)
-            cls.section += 1
-            # print(cls.section)
         else:
-            pass
+            cls.section += 1
+            p1 = plotBeautify(str(event))
+            p2 = plotBeautify(str(module_name))
+            p3 = plotBeautify(
+                str(str(code.co_name) + ":" + str(frame.f_lineno)))
+            p4 = plotBeautify(str(arg))
+            print(__start__) if str(event) == 'call' else do_nothing()
+            print(__block__.format(cls.section, p1, p2, p3, p4))
+            print(__arrow__) if str(event) != 'return' else print(__end__)
 
     @classmethod
     def trace(cls, frame, event, arg):
@@ -63,5 +62,6 @@ class Tracer:
 
 
 if __name__ == "__main__":
-    t = Tracer()
+    from devtool.tests.testSystrace import add
+    t = GraphTracer()
     t.collect(add, 1, 2)
