@@ -5,12 +5,13 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:29:18
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-26 15:03:58
+LastEditTime: 2021-02-20 10:52:57
 '''
 __version__ = '0.0.2'
 __appname__ = 'DevTool'
 
 import argparse
+import difflib
 import inspect
 import logging
 import multiprocessing
@@ -25,8 +26,9 @@ from multiprocessing import Manager
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
-from devtool.utils.common import plotBeautify, showPsInfo_after, showPsInfo_before
-from devtool.utils import __arrow__, __block__, __end__,__start__
+from devtool.utils import __arrow__, __block__, __end__, __start__, do_nothing
+from devtool.utils.common import (plotBeautify, showPsInfo_after,
+                                  showPsInfo_before)
 
 __current_platform__ = platform.system()
 
@@ -53,6 +55,11 @@ formatter = logging.Formatter(
 rHandler.setFormatter(formatter)
 
 logit_logger.addHandler(rHandler)
+
+# __information_level__ = {"warning": "yellow", "error": "red"}
+__information__ = ["warning","error"]
+__level__ = ["yellow","red"]
+__information_level__ = zip(__information__,__level__)
 
 
 class Tracer:
@@ -122,6 +129,8 @@ class BaseParser(object):
 
 
 class FuncAndName:
+    similarity = 0.5
+
     def __init__(self, funcName: str, func, info: str = ''):
         self.funcName = funcName
         self.func = func
@@ -137,6 +146,41 @@ class FuncAndName:
 
     def __str__(self):
         return self.funcName
+
+    @classmethod
+    def setSimilarity(cls, num: float):
+        assert num >= 0 and num <= 1, "threshold must be a float and between 0 and 1"
+        cls.similarity = num
+
+    def __sub__(self, other):
+        assert self.__class__ == other.__class__, "input class not match"
+        # print(self.similarity)
+        s = max(self.similarity, other.similarity)
+        m = difflib.SequenceMatcher(None, self.funcName,
+                                    other.funcName).ratio()
+        if m > s:
+            if m == 1:
+                return [
+                    dict(__information_level__).get("error",""), self.funcName,
+                    other.funcName, ""
+                ]
+            else:
+                if self.func.__module__ == other.func.__module__:
+                    return [
+                        dict(__information_level__).get("warning",""), self.funcName,
+                        other.funcName,
+                        "similar function name in same module {}".format(
+                            self.func.__module__)
+                    ]
+                else:
+                    return [
+                        dict(__information_level__).get("warning"), self.funcName,
+                        other.funcName,
+                        "similar function name in different module {} and {}".
+                        format(self.func.__module__, other.func.__module__)
+                    ]
+        else:
+            return ["", self.funcName, other.funcName, ""]
 
 
 class FuncnameParamRes:
@@ -157,10 +201,6 @@ class FuncnameParamRes:
 
     def __str__(self):
         return self.funcName
-
-
-def do_nothing():
-    pass
 
 
 def testWrapper(func):

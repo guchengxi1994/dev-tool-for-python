@@ -5,17 +5,13 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-28 08:47:04
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-28 11:25:43
+LastEditTime: 2021-02-20 10:41:28
 '''
 
 import inspect
 import sys
 from devtool.utils.common import plotBeautify
-from devtool.utils import __start__, __block__, __arrow__, __end__
-
-
-def do_nothing():
-    pass
+from devtool.utils import __start__, __block__, __arrow__, __end__, do_nothing
 
 
 class GraphTracer:

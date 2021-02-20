@@ -5,7 +5,7 @@ version: beta
 Author: xiaoshuyui
 Date: 2021-01-06 08:26:44
 LastEditors: xiaoshuyui
-LastEditTime: 2021-01-26 13:29:49
+LastEditTime: 2021-02-20 11:02:54
 '''
 import datetime
 import importlib
@@ -14,8 +14,9 @@ import os
 import yaml
 from termcolor import colored
 
-from devtool import (__current_platform__, do_nothing, infoDecorate, logit,
-                     logit_logger, setWrap)
+from devtool import (__current_platform__, infoDecorate, logit, logit_logger,
+                     setWrap)
+from devtool.utils import do_nothing
 from devtool.utils.common import (match_datetime, validate_date,
                                   validate_datetime)
 from devtool.utils.getFunctions import find_functions
@@ -102,6 +103,30 @@ class DevTool:
                         remainedRes.append(i)
             cls.storage = remainedRes
             return remainedRes
+
+    @classmethod
+    def analysis(cls):
+        if len(cls.storage) == 0:
+            print(
+                'Nothing found. Plz run DevTool.exec() first or just there is nothing to find.'
+            )
+            return
+        res = []
+        for i in range(0, len(cls.storage) - 1):
+            for j in range(i + 1, len(cls.storage)):
+                r = cls.storage[i] - cls.storage[j]
+                res.append(r)
+
+        # print(res)
+        for i in res:
+            if i[0] != "":
+                if __current_platform__ != "Windows":
+                    text = colored("{},{},{}".format(i[1], i[2], i[3]),
+                                   i[0],
+                                   attrs=['reverse', 'blink'])
+                    print(text)
+                else:
+                    print("{},{},{}".format(i[1], i[2], i[3]))
 
     @classmethod
     def tree(cls, moduleName):

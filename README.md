@@ -5,7 +5,7 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-01-26 14:57:45
+ * @LastEditTime: 2021-02-20 09:26:19
 -->
 # dev-tool-for-python
  a small tool for python development
@@ -33,7 +33,9 @@
 
     pip install -r requestments.txt
 
-## 2. Copy the "devtool" folder into your project.
+## 2. Copy the "devtool" folder into your project, or try
+
+    pip install DevTool
 
 ## 3. Details.
 
