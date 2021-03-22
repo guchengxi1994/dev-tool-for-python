@@ -7,6 +7,9 @@ Date: 2021-01-26 09:26:47
 LastEditors: xiaoshuyui
 LastEditTime: 2021-01-26 10:35:03
 '''
+import sys
+sys.path.append("..")
+
 from devtool.devTool import DevTool
 
 DevTool.search('pyqt5 opencv-python')

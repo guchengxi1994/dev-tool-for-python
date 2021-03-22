@@ -8,8 +8,11 @@ LastEditors: xiaoshuyui
 LastEditTime: 2021-02-26 09:13:33
 '''
 
-from inputController import setDoc
-from utils import getDoc, loadDoc
+import sys
+sys.path.append("..")
+
+from pyswagger.inputController import setDoc
+from pyswagger.utils import getDoc, loadDoc
 
 
 def test(a,b,c):
@@ -26,7 +29,6 @@ def test(a,b,c):
         type : int
        c :
         type : list
-
     """
     pass
 
@@ -41,7 +43,7 @@ if __name__ == "__main__":
 
     print(s)
 
-    setDoc()
+    setDoc(test.__name__,test)
 
     # print(document)
 

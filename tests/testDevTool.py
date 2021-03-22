@@ -7,6 +7,9 @@ Date: 2021-01-06 10:51:46
 LastEditors: xiaoshuyui
 LastEditTime: 2021-02-20 09:41:13
 '''
+import sys
+sys.path.append("..")
+
 import datetime
 import importlib
 import inspect

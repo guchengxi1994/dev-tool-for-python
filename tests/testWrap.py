@@ -8,8 +8,11 @@ LastEditors: xiaoshuyui
 LastEditTime: 2021-01-26 15:01:05
 '''
 
+import sys
+sys.path.append("..")
+
 from devtool import Test, afterExec, beforeExec, infoDecorate, logit, recTime, running, setWrap, testWrapper
-from devtool.tests.utils import func1
+from tests.utils import func1
 import time
 
 

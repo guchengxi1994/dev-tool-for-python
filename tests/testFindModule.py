@@ -7,6 +7,9 @@ Date: 2021-01-06 11:36:12
 LastEditors: xiaoshuyui
 LastEditTime: 2021-01-06 15:29:27
 '''
+import sys
+sys.path.append("..")
+
 import importlib
 import os
 import sys
