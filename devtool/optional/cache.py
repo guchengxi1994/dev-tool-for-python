@@ -38,6 +38,7 @@ class LRUDecorator(LRU):
         if val is None:
             res = self.func(*args, **kwds)
             super()._set(self.func.__name__, res)
+            return res
         else:
             val = super()._get(self.func.__name__)
             return val
