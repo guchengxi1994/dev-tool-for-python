@@ -7,6 +7,9 @@ Date: 2021-01-26 12:16:59
 LastEditors: xiaoshuyui
 LastEditTime: 2021-01-26 14:40:24
 '''
+import sys
+sys.path.append("..")
+
 from devtool.utils.common import plotBeautify
 from devtool.utils import __block__,__arrow__
 from devtool import Tracer, traceplot
