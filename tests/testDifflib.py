@@ -9,8 +9,6 @@ LastEditTime: 2021-02-20 10:18:45
 '''
 from difflib import SequenceMatcher
 
-print(round(SequenceMatcher(None,"abcd","def").ratio(),4))
-
 
 class Test:
     num = 5
@@ -21,5 +19,8 @@ class Test:
     def p(self):
         print(self.num)
 
-t = Test(8)
-t.p()
+
+if __name__ == "__main__":
+    t = Test(8)
+    t.p()
+    print(round(SequenceMatcher(None,"abcd","def").ratio(),4))

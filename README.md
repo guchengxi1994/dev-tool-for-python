@@ -136,6 +136,10 @@ And "MINE" is my style. :)
 
 # Change log
 
+### 2021.4.10
+
+1. converting entities to images is under construction. See [here](./entity2uml/readme.md)
+
 ### 2021.1.26
 
 1. merge some usage from ['show-and-search'](https://github.com/guchengxi1994/show-and-search)

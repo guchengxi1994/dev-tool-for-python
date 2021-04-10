@@ -5,9 +5,21 @@
 /build
 /dist
 /.vscode
+
+# devtool
 /devtool/tests/__pycache__
 /devtool/tests/utils/__pycache__
 /devtool/utils/__pycache__
 /DevLog
 /DevTool.egg-info
 /Test
+/devtool/optional/__pycache__
+/devtool/optional/auth/__pycache__
+
+
+# tests
+/tests/utils/__pycache__
+/tests/testEntities/__pycache__
+
+# entity2uml
+/entity2uml/__pycache__

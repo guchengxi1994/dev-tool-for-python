@@ -1,12 +1,5 @@
 from collections import namedtuple
 
-Friend = namedtuple("Friend", ['name', "age", "sex"])
-
-print(Friend.__doc__)
-
-print(type(Friend))
-
-friend = Friend(name="aaa", age=20, sex="unknow")
 
 
 def testFunc(_):
@@ -16,16 +9,20 @@ def testFunc(_):
 def testFuncWithParams(_, a, b, c):
     return a + b + c
 
+if __name__ == "__main__":
+    Friend = namedtuple("Friend", ['name', "age", "sex"])
+    print(Friend.__doc__)
+    print(type(Friend))
+    friend = Friend(name="aaa", age=20, sex="unknow")
+    setattr(Friend, "func1", testFunc)
+    setattr(Friend, "func2", testFuncWithParams)
 
-setattr(Friend, "func1", testFunc)
-setattr(Friend, "func2", testFuncWithParams)
+    print(friend._asdict())
+    # print(Friend.__dict__)
+    print(dir(Friend))
 
-print(friend._asdict())
-# print(Friend.__dict__)
-print(dir(Friend))
+    # print(friend.func1)
+    friend.func1()
 
-# print(friend.func1)
-friend.func1()
-
-r = friend.func2(1, 2, 3)
-print(r)
+    r = friend.func2(1, 2, 3)
+    print(r)

@@ -1,0 +1,7 @@
+digraph {
+	entity [label=Sixth shape=rectangle]
+	attr_0 [label=clsParam shape=ellipse]
+	attr_1 [label=clsParam2 shape=ellipse]
+	entity -> attr_0 [arrowhead=none]
+	entity -> attr_1 [arrowhead=none]
+}

@@ -9,7 +9,7 @@ LastEditTime: 2021-01-06 16:26:01
 '''
 import sys
 from setuptools import find_packages
-from pkgutil import iter_modules
+from pkgutil import iter_modules, walk_packages
 
 
 def find_modules(path):
@@ -27,3 +27,13 @@ def find_modules(path):
                 if not info.ispkg:
                     modules.add(pkg + '.' + info.name)
     return list(modules)
+
+
+def get_modules_location(path, name):
+    res = set()
+    for _, modname, _ in walk_packages(path,
+                                       prefix=name,
+                                       onerror=lambda x: None):
+        res.add(modname)
+
+    return list(res)
