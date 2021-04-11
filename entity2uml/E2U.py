@@ -4,12 +4,12 @@ import os
 import re
 import sys
 from types import FunctionType, MethodType
-from graphviz import Digraph, Graph
+from graphviz import Digraph
 
 from devtool.utils.getModules import get_modules_location
 
 from entity2uml import FakeClass, __default_methods__
-from entity2uml.drawer import __shapes__, __formats__
+from entity2uml.drawer import Diagram, __shapes__, __formats__
 
 pattern = re.compile("'(.*)'")
 
@@ -137,21 +137,68 @@ class ERMap:
         cls.ermapComment = path
 
     @classmethod
-    def drawEntityMap(cls, Entity: type):
+    def drawEntityMap(cls, Entity: type, index="", render=True):
         name, ats = Preparation.getEntityMap(Entity)
-        cls.dot.node("entity", name, shape=__shapes__['entity'])
+        cls.dot.node("entity" + index, name, shape=__shapes__['entity'])
         # draw attributs
         attrs = []
         for i in range(len(ats)):
-            attrs.append("attr_{}".format(i))
-            cls.dot.node("attr_{}".format(i),
-                         str(ats[i]),
-                         shape=__shapes__['attributes'])
+            if index == "":
+                attrs.append("attr_{}".format(i))
+                cls.dot.node("attr_{}".format(i),
+                             str(ats[i]),
+                             shape=__shapes__['attributes'])
+            else:
+                attrs.append("attr_{}_{}".format(index, i))
+                cls.dot.node("attr_{}_{}".format(index, i),
+                             str(ats[i]),
+                             shape=__shapes__['attributes'])
 
         # draw edges
         for i in attrs:
-            cls.dot.edge("entity", i, arrowhead="none")
+            cls.dot.edge("entity"+index, i, arrowhead="none")
 
-        cls.dot.render(cls.savePath + cls.ermapName,
-                       view=True,
-                       format=cls._format)
+        if render:
+            cls.dot.render(cls.savePath + cls.ermapName,
+                           view=True,
+                           format=cls._format)
+
+    @classmethod
+    def drawERDiagram(cls, param: Diagram):
+        """tuple : param = (entity1,entity2,"relation","m2n")
+           
+           m2n should be in __relations__.keys()
+        
+           List : params = [param1,param2,...,paramN]
+        """
+        if type(param) is type:
+            cls.drawEntityMap(param)
+
+        if type(param) is tuple:
+            cls.drawEntityMap(param[0], index="0", render=False)
+            cls.drawEntityMap(param[1], index="1", render=False)
+
+            # drawRelation
+            cls.dot.node('relation',
+                         label=param[2],
+                         shape=__shapes__['relation'])
+
+            # drawEdges
+            if param[3] == 'one2one':
+                label1 = "1"
+                label2 = "1"
+            if param[3] == 'one2many':
+                label1 = "1"
+                label2 = "n"
+            if param[3] == 'many2one':
+                label1 = "n"
+                label2 = "1"
+            if param[3] == 'many2many':
+                label1 = "n"
+                label2 = "n"
+            cls.dot.edge("entity0", "relation", label=label1, arrowhead="none")
+            cls.dot.edge("entity1", "relation", label=label2, arrowhead="none")
+
+            cls.dot.render(cls.savePath + cls.ermapName,
+                           view=True,
+                           format=cls._format)

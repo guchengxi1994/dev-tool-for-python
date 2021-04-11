@@ -1,0 +1,15 @@
+digraph {
+	entity0 [label=Sixth shape=rectangle]
+	attr_0_0 [label=clsParam shape=ellipse]
+	attr_0_1 [label=clsParam2 shape=ellipse]
+	entity0 -> attr_0_0 [arrowhead=none]
+	entity0 -> attr_0_1 [arrowhead=none]
+	entity1 [label=Seventh shape=rectangle]
+	attr_1_0 [label=clsParam4 shape=ellipse]
+	attr_1_1 [label=clsParam3 shape=ellipse]
+	entity1 -> attr_1_0 [arrowhead=none]
+	entity1 -> attr_1_1 [arrowhead=none]
+	relation [label=has shape=diamond]
+	entity0 -> relation [label=1 arrowhead=none]
+	entity1 -> relation [label=1 arrowhead=none]
+}

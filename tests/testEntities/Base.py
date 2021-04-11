@@ -18,6 +18,8 @@ class Sixth(Fifth):
     def testMethod(self):...
 
 class Seventh(Fifth):
+    clsParam3 = 'ccc'
+    clsParam4 = 'ddd'
     def __init__(self,name:str='',sex:str='') -> None:
         self.name = name
         self.sex = sex

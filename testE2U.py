@@ -39,4 +39,6 @@ if __name__ == "__main__":
 
     # E2U.Preparation.getEntityMap(Sixth)
 
-    E2U.ERMap.drawEntityMap(Sixth)
+    # E2U.ERMap.drawEntityMap(Sixth)
+
+    E2U.ERMap.drawERDiagram((Sixth,Seventh,'has',"one2one"))

@@ -13,3 +13,16 @@ __formats__ = [
     "bmp",
     "png"
 ]
+
+# map <str,style>  style is graphviz line style
+__relations__ = {
+    "one2one":"",
+    "many2one":"",
+    "many2many":"",
+    "one2many":""
+}
+
+from typing import TypeVar
+
+
+Diagram = TypeVar('Diagram',type,tuple,list)
