@@ -4,12 +4,12 @@ import os
 import re
 import sys
 from types import FunctionType, MethodType
-from graphviz import Digraph
 
 from devtool.utils.getModules import get_modules_location
+from graphviz import Digraph
 
 from entity2uml import FakeClass, __default_methods__
-from entity2uml.drawer import Diagram, __shapes__, __formats__
+from entity2uml.drawer import Diagram, __engines__, __formats__, __shapes__
 
 pattern = re.compile("'(.*)'")
 
@@ -107,7 +107,14 @@ class ERMap:
     ermapComment = "drawing comment"
     savePath = './'
     _format = 'jpg'
-    dot = Digraph()
+    _engine = 'neato'
+    _color = 'skyblue'
+    dot = Digraph(engine=_engine)
+
+    @classmethod
+    def setColor(cls, _color: str):
+        assert type(_color) is str, "format must be a not-null string "
+        cls._color = _color
 
     @classmethod
     def setFormat(cls, _format: str):
@@ -116,6 +123,17 @@ class ERMap:
         ) is str and _format in __formats__, "format must be a not-null string and in {}".format(
             ",".join(__formats__))
         cls._format = _format
+
+    @classmethod
+    def setEngine(cls, _engine: str):
+        """set graphviz engine
+        """
+        assert type(
+            _engine
+        ) is str and _engine in __engines__, "format must be a not-null string and in {}".format(
+            ",".join(__engines__))
+        cls._engine = _engine
+        cls.dot.engine = cls._engine
 
     @classmethod
     def setName(cls, name: str):
@@ -129,6 +147,7 @@ class ERMap:
             comment
         ) is str and comment != "", "comment must be a not-null string"
         cls.ermapComment = comment
+        cls.dot.comment = cls.ermapComment
 
     @classmethod
     def setSavePath(cls, path: str):
@@ -137,7 +156,7 @@ class ERMap:
         cls.ermapComment = path
 
     @classmethod
-    def drawEntityMap(cls, Entity: type, index="", render=True):
+    def _drawEntityMap(cls, Entity: type, index="", render=True):
         name, ats = Preparation.getEntityMap(Entity)
         cls.dot.node("entity" + index, name, shape=__shapes__['entity'])
         # draw attributs
@@ -156,7 +175,7 @@ class ERMap:
 
         # draw edges
         for i in attrs:
-            cls.dot.edge("entity"+index, i, arrowhead="none")
+            cls.dot.edge("entity" + index, i, arrowhead="none")
 
         if render:
             cls.dot.render(cls.savePath + cls.ermapName,
@@ -172,11 +191,11 @@ class ERMap:
            List : params = [param1,param2,...,paramN]
         """
         if type(param) is type:
-            cls.drawEntityMap(param)
+            cls._drawEntityMap(param)
 
         if type(param) is tuple:
-            cls.drawEntityMap(param[0], index="0", render=False)
-            cls.drawEntityMap(param[1], index="1", render=False)
+            cls._drawEntityMap(param[0], index="0", render=False)
+            cls._drawEntityMap(param[1], index="1", render=False)
 
             # drawRelation
             cls.dot.node('relation',
@@ -198,6 +217,59 @@ class ERMap:
                 label2 = "n"
             cls.dot.edge("entity0", "relation", label=label1, arrowhead="none")
             cls.dot.edge("entity1", "relation", label=label2, arrowhead="none")
+
+            cls.dot.render(cls.savePath + cls.ermapName,
+                           view=True,
+                           format=cls._format)
+
+        if type(param) is list:
+            s = dict()
+            ind = 0
+            relationInd = 0
+            for i in param:
+                e1, e2, relation, relationType = i[0], i[1], i[2], i[3]
+                if e1.__name__ in s.keys():
+                    pass
+                else:
+                    ind += 1
+                    cls._drawEntityMap(e1, index=str(ind), render=False)
+                    s[e1.__name__] = str(ind)
+
+                if e2.__name__ in s.keys():
+                    pass
+                else:
+                    ind += 1
+                    cls._drawEntityMap(e2, index=str(ind), render=False)
+                    s[e2.__name__] = str(ind)
+
+                relationInd += 1
+                cls.dot.node('relation' + str(relationInd),
+                             label=relation,
+                             shape=__shapes__['relation'])
+
+                if relationType == 'one2one':
+                    label1 = "1"
+                    label2 = "1"
+                if relationType == 'one2many':
+                    label1 = "1"
+                    label2 = "n"
+                if relationType == 'many2one':
+                    label1 = "n"
+                    label2 = "1"
+                if relationType == 'many2many':
+                    label1 = "n"
+                    label2 = "n"
+
+                cls.dot.edge("entity" + s.get(e1.__name__),
+                             'relation' + str(relationInd),
+                             label=label1,
+                             color=cls._color,
+                             arrowhead="none")
+                cls.dot.edge("entity" + s.get(e2.__name__),
+                             'relation' + str(relationInd),
+                             label=label2,
+                             color=cls._color,
+                             arrowhead="none")
 
             cls.dot.render(cls.savePath + cls.ermapName,
                            view=True,

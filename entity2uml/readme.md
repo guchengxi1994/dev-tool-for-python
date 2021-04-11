@@ -11,3 +11,7 @@
 ### try this [script](../testE2U.py)
 
 ![image](../static/drawing.jpg)
+
+### a little complex E-R diagram
+
+![image](../static/drawing.gv.jpg)

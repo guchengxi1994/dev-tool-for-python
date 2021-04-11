@@ -23,3 +23,10 @@ class Seventh(Fifth):
     def __init__(self,name:str='',sex:str='') -> None:
         self.name = name
         self.sex = sex
+
+class Eighth(Fifth):
+    clsParam5 = 'ccc'
+    clsParam6 = 'ddd'
+    def __init__(self,name:str='',sex:str='') -> None:
+        self.name = name
+        self.sex = sex

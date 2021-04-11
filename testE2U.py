@@ -1,20 +1,24 @@
-from tests.testEntities.Base import Seventh, Sixth
+from tests.testEntities.Base import Eighth, Seventh, Sixth
 from entity2uml import E2U
 from devtool.devTool import DevTool
 import inspect
 
+
 class A:
-    def __init__(self,a:str,b:int) -> None:
+    def __init__(self, a: str, b: int) -> None:
         self.a = a
         self.b = b
 
+
 class B(A):
-    def __init__(self,a:str="",b:int=0) -> None:
+    def __init__(self, a: str = "", b: int = 0) -> None:
         self.a = a
         self.b = b
+
 
 class C(B):
     ...
+
 
 if __name__ == "__main__":
     print("===================")
@@ -41,4 +45,11 @@ if __name__ == "__main__":
 
     # E2U.ERMap.drawEntityMap(Sixth)
 
-    E2U.ERMap.drawERDiagram((Sixth,Seventh,'has',"one2one"))
+    params = [(Sixth, Seventh, 'has', "one2one"),
+              (Seventh, Eighth, 'has', "one2one"),
+              (Sixth, Eighth, 'has', "one2one")]
+
+    # E2U.ERMap.drawERDiagram((Sixth, Seventh, 'has', "one2one"))
+    E2U.ERMap.setColor('yellow')
+    E2U.ERMap.setComment('balabombka')
+    E2U.ERMap.drawERDiagram(params)
