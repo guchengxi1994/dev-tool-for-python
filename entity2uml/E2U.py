@@ -274,3 +274,22 @@ class ERMap:
             cls.dot.render(cls.savePath + cls.ermapName,
                            view=True,
                            format=cls._format)
+
+
+class UMLDiagram:
+    _engine = 'dot'
+    dot = Digraph(engine=_engine)
+    ermapName = 'drawing.gv'
+    savePath = './'
+    _format = 'jpg'
+
+    @classmethod
+    def drawUMLDiagram(cls, Entity: type, index="", render=True):
+        name, ats = Preparation.getEntityMap(Entity)
+        cls.dot.node("entity" + index,
+                     "{" + "{}|name1|name2".format(name) + "}",
+                     shape="record")
+
+        cls.dot.render(cls.savePath + cls.ermapName,
+                       view=True,
+                       format=cls._format)

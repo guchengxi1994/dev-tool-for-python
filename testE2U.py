@@ -49,7 +49,9 @@ if __name__ == "__main__":
               (Seventh, Eighth, 'has', "one2one"),
               (Sixth, Eighth, 'has', "one2one")]
 
-    # E2U.ERMap.drawERDiagram((Sixth, Seventh, 'has', "one2one"))
-    E2U.ERMap.setColor('yellow')
-    E2U.ERMap.setComment('balabombka')
-    E2U.ERMap.drawERDiagram(params)
+    
+    # E2U.ERMap.setColor('yellow')
+    # E2U.ERMap.setComment('balabombka')
+    # E2U.ERMap.drawERDiagram(params)
+
+    E2U.UMLDiagram.drawUMLDiagram(Sixth)
