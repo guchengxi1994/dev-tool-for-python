@@ -20,7 +20,8 @@ __relations__ = {
     "one2one":{'color':'red'},
     "many2one":{'color':'green'},
     "many2many":{'color':'blue'},
-    "one2many":{'color':'gold'}
+    "one2many":{'color':'gold'},
+    "extend":{'color':'red'}
 }
 
 __engines__ = [
@@ -37,3 +38,7 @@ from typing import TypeVar
 
 
 Diagram = TypeVar('Diagram',type,tuple,list)
+
+__prefix__ = "{"
+__suffix__ = "}"
+__sep__ = "|{}"

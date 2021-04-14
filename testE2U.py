@@ -21,37 +21,45 @@ class C(B):
 
 
 if __name__ == "__main__":
+    """
     print("===================")
     E2U.Preparation.warning()
     E2U.Preparation.setModuleName("tests.testEntities")
-    E2U.Preparation.E2EInspect()
+    res = E2U.Preparation.E2EInspect()
+    for r in res:
+        print(r)
+        print(r.childName)
     print("===================")
 
-    # s = Sixth("a","b")
-    # print(dir(s))
+    s = Sixth("a","b")
+    print(dir(s))
 
-    # s2 = C.__new__(Sixth)
-    # print(type(Sixth) is type)
-    # print(dir(s2))
+    s2 = C.__new__(Sixth)
+    print(type(Sixth) is type)
+    print(dir(s2))
 
-    # print(inspect.ismethod(s2.testMethod))
+    print(inspect.ismethod(s2.testMethod))
 
-    # func = getattr(s2,"testMethod")
-    # print(type(func))
+    func = getattr(s2,"testMethod")
+    print(type(func))
 
-    # print("X"*20)
+    print("X"*20)
 
-    # E2U.Preparation.getEntityMap(Sixth)
+    E2U.Preparation.getEntityMap(Sixth)
 
-    # E2U.ERMap.drawEntityMap(Sixth)
+    E2U.ERMap.drawEntityMap(Sixth)
+    """
 
+    # draw ER diagram
     params = [(Sixth, Seventh, 'has', "one2one"),
               (Seventh, Eighth, 'has', "one2one"),
               (Sixth, Eighth, 'has', "one2one")]
 
     
-    # E2U.ERMap.setColor('yellow')
-    # E2U.ERMap.setComment('balabombka')
-    # E2U.ERMap.drawERDiagram(params)
+    E2U.ERMap.setColor('yellow')
+    E2U.ERMap.setComment('balabombka')
+    E2U.ERMap.drawERDiagram(params)
 
-    E2U.UMLDiagram.drawUMLDiagram(Sixth)
+
+    # draw UML diagram
+    E2U.UMLDiagram.drawE2EUMLDiagram("tests.testEntities")

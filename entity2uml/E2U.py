@@ -3,15 +3,34 @@ import inspect
 import os
 import re
 import sys
+import traceback
 from types import FunctionType, MethodType
 
 from devtool.utils.getModules import get_modules_location
 from graphviz import Digraph
 
 from entity2uml import FakeClass, __default_methods__
-from entity2uml.drawer import Diagram, __engines__, __formats__, __shapes__
+from entity2uml.drawer import (Diagram, __engines__, __formats__, __prefix__,
+                               __sep__, __shapes__, __suffix__)
 
 pattern = re.compile("'(.*)'")
+
+
+class E2ERelation:
+    def __init__(self, child: type, father: type) -> None:
+        self.child = child
+        self.father = father
+
+    def __str__(self) -> str:
+        return self.child.__name__ + ":" + str(self.father.__name__)
+
+    @property
+    def childName(self):
+        return self.child.__module__ + '.' + self.child.__name__
+
+    @property
+    def fatherName(self):
+        return self.father.__module__ + '.' + self.father.__name__
 
 
 class Preparation:
@@ -34,6 +53,7 @@ class Preparation:
         name = ''
         sub_modules = []
         classes = []
+        rs = []
         try:
             module = importlib.__import__(cls.moduleName)
             modulePath = os.path.dirname(module.__file__)
@@ -62,16 +82,20 @@ class Preparation:
                     cla = FakeClass.__new__(i)
                     key = pattern.findall(str(i))[0]
                     if key.startswith(cls.moduleName):
-                        value = []
                         r = cla.__class__.__bases__
+                        # print(type(r[0]))
                         for j in r:
-                            value.append(pattern.findall(str(j))[0])
-                        print(value)
-
-                except:
+                            # value = []
+                            s = pattern.findall(str(j))[0]
+                            if s != "object":
+                                # value.extend(pattern.findall(str(j))[0])
+                                rs.append(E2ERelation(child=i, father=j))
+                except Exception:
+                    traceback.print_exc()
                     print(
                         "cannot call __new__() on {}, maybe it is an Exception?"
                         .format(str(i)))
+        return rs
 
     @staticmethod
     def getEntityMap(Entity: type):
@@ -87,13 +111,41 @@ class Preparation:
 
             if localAttributes == []:
                 print("None attributes found")
-                return
 
             ats = []
             for i in localAttributes:
                 a = getattr(Entity, i)
                 if type(a) not in [MethodType, FunctionType]:
                     ats.append(i)
+            # print(ats)
+            return Entity.__name__, ats
+
+        except Exception as e:
+            print("Cannot draw :-( .Because {}.".format(e))
+            return Entity.__name__, []
+
+    @staticmethod
+    def getUMLMap(Entity: type):
+        """get a UML map, inculding params and functions
+
+        The Entity attributes should be class attributes
+        """
+        assert type(Entity) is type, "Input type must be 'type'"
+        try:
+            s = FakeClass.__new__(Entity)
+            s_dirs = set(dir(s))
+            localAttributes = list(s_dirs.difference(set(__default_methods__)))
+
+            if localAttributes == []:
+                print("None attributes found")
+
+            ats = []
+            for i in localAttributes:
+                a = getattr(Entity, i)
+                if type(a) not in [MethodType, FunctionType]:
+                    ats.append("Param: " + i)
+                else:
+                    ats.append("Method: " + i)
             # print(ats)
             return Entity.__name__, ats
 
@@ -284,12 +336,42 @@ class UMLDiagram:
     _format = 'jpg'
 
     @classmethod
-    def drawUMLDiagram(cls, Entity: type, index="", render=True):
-        name, ats = Preparation.getEntityMap(Entity)
-        cls.dot.node("entity" + index,
-                     "{" + "{}|name1|name2".format(name) + "}",
-                     shape="record")
+    def _drawUMLDiagram(cls, Entity: type, index="", render=True):
+        name, ats = Preparation.getUMLMap(Entity)
+        diagramStr = __prefix__ + "Classname: " + name
+        for i in ats:
+            diagramStr += __sep__.format(i)
+        diagramStr = diagramStr + __suffix__
 
+        cls.dot.node("entity" + index, diagramStr, shape="record")
+        print("entity" + index)
+
+        if render:
+            cls.dot.render(cls.savePath + cls.ermapName,
+                           view=True,
+                           format=cls._format)
+
+    @classmethod
+    def drawE2EUMLDiagram(cls, moduleName: str):
+        Preparation.setModuleName(moduleName)
+        rs = Preparation.E2EInspect()
+        cs = set()
+        fs = set()
+        for r in rs:
+            if r.childName not in cs:
+                cs.add(r.childName)
+                if r.child is not None:
+                    cls._drawUMLDiagram(r.child,
+                                        index=r.childName,
+                                        render=False)
+
+            if r.fatherName not in fs:
+                if r.father is not None:
+                    cls._drawUMLDiagram(r.father,
+                                        index=r.fatherName,
+                                        render=False)
+
+            cls.dot.edge("entity" + r.childName, "entity" + r.fatherName)
         cls.dot.render(cls.savePath + cls.ermapName,
                        view=True,
                        format=cls._format)

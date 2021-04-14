@@ -15,3 +15,7 @@
 ### a little complex E-R diagram
 
 ![image](../static/drawing.gv.jpg)
+
+### simple UML diagram
+
+![image](../static/drawing.extend.jpg)
