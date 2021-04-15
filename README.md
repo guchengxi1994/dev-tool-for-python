@@ -39,6 +39,10 @@
 
 # Change log
 
+### 2020.4.15
+
+is going to develop a tool, crop an image, using OCR to get words ,translate.
+
 ### 2021.4.14
 
 Drawing simple UML and ER diagram supported.
