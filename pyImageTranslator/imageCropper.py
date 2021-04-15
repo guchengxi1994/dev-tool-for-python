@@ -1,18 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Created by GJ on 2017/11/21
 import sys
+sys.path.append("..")
 from PyQt5.QtGui import QPainter, QIcon
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QFileDialog, QSystemTrayIcon, QAction, QMenu
 from PyQt5.QtCore import Qt, pyqtSignal
-import logging
+from pyImageTranslator.utils.preparation import fakeArgs,changeImgPath
+# print(fakeArgs.__dict__)
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-formatter = logging.Formatter('%(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
 
 
 class MyWin(QMainWindow):
@@ -77,7 +70,6 @@ class ScreenShotsWin(QMainWindow):
         :param end:截图结束点
         :return:
         '''
-        logger.debug('开始截图,%s, %s', start, end)
 
         x = min(start[0], end[0])
         y = min(start[1], end[1])
@@ -102,7 +94,6 @@ class ScreenShotsWin(QMainWindow):
         :param event:
         :return:
         '''
-        logger.debug('开始画图')
         x = self.start[0]
         y = self.start[1]
         w = self.end[0] - x
@@ -116,17 +107,14 @@ class ScreenShotsWin(QMainWindow):
         # 点击左键开始选取截图区域
         if event.button() == Qt.LeftButton:
             self.start = (event.pos().x(), event.pos().y())
-            logger.debug('开始坐标：%s', self.start)
 
     def mouseReleaseEvent(self, event):
 
         # 鼠标左键释放开始截图操作
         if event.button() == Qt.LeftButton:
             self.end = (event.pos().x(), event.pos().y())
-            logger.debug('结束坐标：%s', self.end)
 
             self.oksignal.emit()
-            logger.debug('信号提交')
             # 进行重新绘制
             self.update()
 
@@ -139,8 +127,8 @@ class ScreenShotsWin(QMainWindow):
             self.update()
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    dbb = MyWin()
-    dbb.show()
-    sys.exit(app.exec_())
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     dbb = MyWin()
+#     dbb.show()
+#     sys.exit(app.exec_())
