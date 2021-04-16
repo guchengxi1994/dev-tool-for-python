@@ -1,8 +1,9 @@
 import os
+
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import sys
 
 sys.path.append("..")
-import subprocess
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(__dir__)
@@ -23,6 +24,7 @@ from pyImageTranslator.PaddleOCR.ppocr.utils.utility import (
 from pyImageTranslator.PaddleOCR.tools.infer import (predict_cls, predict_det,
                                                      predict_rec, utility)
 from pyImageTranslator.PaddleOCR.tools.infer.utility import draw_ocr_box_txt
+from pyImageTranslator.utils.preparation import fakeArgs
 
 logger = get_logger()
 

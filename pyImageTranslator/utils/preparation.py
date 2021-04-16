@@ -1,33 +1,57 @@
 from pyImageTranslator.utils.entity import FakeArgs
 
+__work__ = True
+
 fakeArgs = FakeArgs()
 # 可换参数
 setattr(
     fakeArgs, "cls_model_dir",
     "D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\interence\\ch_ppocr_mobile_v2.0_cls_infer\\"
+) if not __work__ else setattr(
+    fakeArgs, "cls_model_dir",
+    "D:\\github_repo\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\interence\\ch_ppocr_mobile_v2.0_cls_infer\\"
 )
 setattr(
     fakeArgs, "det_model_dir",
     "D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\interence\\ch_ppocr_server_v2.0_det_infer\\"
+) if not __work__ else setattr(
+    fakeArgs, "det_model_dir",
+    "D:\\github_repo\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\interence\\ch_ppocr_server_v2.0_det_infer\\"
 )
 setattr(
     fakeArgs, "e2e_char_dict_path",
     "D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\ppocr\\utils\\ic15_dict.txt"
+) if not __work__ else setattr(
+    fakeArgs, "e2e_char_dict_path",
+    "D:\\github_repo\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\ppocr\\utils\\ic15_dict.txt"
 )
 setattr(
     fakeArgs, "image_dir",
-    "D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\doc\\imgs\\11.jpg")
+    "D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\doc\\imgs\\11.jpg"
+) if not __work__ else setattr(
+    fakeArgs, "image_dir",
+    "D:\\github_repo\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\doc\\imgs\\11.jpg"
+)
 setattr(
     fakeArgs, "rec_char_dict_path",
     "D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\ppocr\\utils\\ppocr_keys_v1.txt"
+) if not __work__ else setattr(
+    fakeArgs, "rec_char_dict_path",
+    "D:\\github_repo\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\ppocr\\utils\\ppocr_keys_v1.txt"
 )
 setattr(
     fakeArgs, "rec_model_dir",
     "D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\interence\\ch_ppocr_server_v2.0_rec_infer\\"
+) if not __work__ else setattr(
+    fakeArgs, "rec_model_dir",
+    "D:\\github_repo\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\interence\\ch_ppocr_server_v2.0_rec_infer\\"
 )
 setattr(
     fakeArgs, "vis_font_path",
     'D:\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\doc\\fonts\\simfang.ttf'
+) if not __work__ else setattr(
+    fakeArgs, "vis_font_path",
+    'D:\\github_repo\\dev-tool-for-python\\pyImageTranslator\\PaddleOCR\\doc\\fonts\\simfang.ttf'
 )
 
 # 默认参数
@@ -80,5 +104,6 @@ setattr(fakeArgs, "use_angle_cls", True)
 setattr(fakeArgs, "use_space_char", True)
 setattr(fakeArgs, "use_tensorrt", False)
 
-def changeImgPath(imgpath:str):
-    setattr(fakeArgs,'image_dir',imgpath)
+
+def changeImgPath(imgpath: str):
+    setattr(fakeArgs, 'image_dir', imgpath)
