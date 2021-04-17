@@ -1,6 +1,6 @@
 from pyImageTranslator.utils.entity import FakeArgs
 
-__work__ = True
+__work__ = False
 
 fakeArgs = FakeArgs()
 # 可换参数

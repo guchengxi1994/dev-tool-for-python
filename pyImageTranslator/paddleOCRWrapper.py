@@ -1,6 +1,19 @@
+'''
+Descripttion: test PaddleOCR
+version: 
+Author: xiaoshuyui
+email: guchengxi1994@qq.com
+Date: 2021-04-15 20:03:19
+LastEditors: xiaoshuyui
+LastEditTime: 2021-04-17 10:25:31
+'''
+
+
 import os
 
-os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+from PIL import Image, ImageDraw, ImageFont
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import sys
 
 sys.path.append("..")
@@ -16,7 +29,6 @@ import time
 
 import cv2
 import numpy as np
-from PIL import Image
 
 from pyImageTranslator.PaddleOCR.ppocr.utils.logging import get_logger
 from pyImageTranslator.PaddleOCR.ppocr.utils.utility import (
@@ -25,6 +37,7 @@ from pyImageTranslator.PaddleOCR.tools.infer import (predict_cls, predict_det,
                                                      predict_rec, utility)
 from pyImageTranslator.PaddleOCR.tools.infer.utility import draw_ocr_box_txt
 from pyImageTranslator.utils.preparation import fakeArgs
+from pyImageTranslator.utils.translator import google
 
 logger = get_logger()
 
@@ -187,13 +200,68 @@ def process(args):
     return res
 
 
-# if __name__ == "__main__":
-#     res = process(fakeArgs)
-#     print('================================')
-#     # [0][0][0],the box  [0][0][1] the text
-#     mi, ma = polygon2rect(res[0][0][0])
+def getFontFactor(zhTxt: str, enTxt: str):
+    zhl = len(zhTxt)
+    enl = len(enTxt)
+    return enl / zhl
 
-#     img = cv2.imread(fakeArgs.image_dir)
-#     # crop imgs
-#     subImg = img[mi[1]:ma[1], mi[0]:ma[0]]
-#     cv2.imwrite('test.jpg', subImg)
+
+def getFontSize(size: float):
+    if size <= 14:
+        return 10
+    elif 14 < size <= 16:
+        return 12
+    elif 16 < size <= 18.7:
+        return 14
+    elif 18.7 < size <= 20:
+        return 15
+    elif 20 < size <= 21.3:
+        return 16
+    elif 21.3 < size <= 24:
+        return 18
+    elif 24 < size <= 29.3:
+        return 22
+    elif 29.3 < size <= 32:
+        return 22
+    elif 32 < size <= 34.7:
+        return 24
+    elif 34.7 < size <= 48:
+        return 26
+    else:
+        return 36
+
+
+if __name__ == "__main__":
+    res = process(fakeArgs)
+    mi, ma = polygon2rect(res[0][0][0])
+
+    img = cv2.imread(fakeArgs.image_dir)
+    backImg = copy.deepcopy(img)
+
+    subImg = img[mi[1]:ma[1], mi[0]:ma[0]]  #height ,width
+
+    g = google()
+
+    for i in range(0, 1):
+        txt = res[0][1][i]
+        mi, ma = polygon2rect(res[0][0][i])
+        try:
+            englishTxt = g.translate(txt)[0]
+            if len(englishTxt) == 0:
+                englishTxt = "Can't explain"
+        except:
+            englishTxt = "WENT ERROR"
+        imgHeight = abs(mi[1] - ma[1])
+        imgWidth = abs(mi[0] - ma[0])
+        im = Image.new("RGB", (imgWidth, imgHeight), (255, 255, 255))
+        dr = ImageDraw.Draw(im)
+        fontSize = getFontSize(imgWidth / len(englishTxt))
+        font = ImageFont.truetype(fakeArgs.vis_font_path,
+                                  size=max(int(fontSize*1.5), 10),
+                                  encoding="utf-8")
+
+        dr.text((10, 10), englishTxt, fill=(0, 0, 0), font=font)
+        im = np.array(im)
+
+        backImg[mi[1]:ma[1],mi[0] :ma[0]] = im
+    cv2.imwrite("t.png",backImg)

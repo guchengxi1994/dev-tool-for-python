@@ -26,3 +26,4 @@ MINE-UI:
         utils : root/utils
         tests : root/tests
         components : root/components
+        forms : root/forms

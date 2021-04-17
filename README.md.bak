@@ -5,9 +5,8 @@
  * @Author: xiaoshuyui
  * @Date: 2021-01-06 08:24:38
  * @LastEditors: xiaoshuyui
- * @LastEditTime: 2021-04-17 11:48:46
+ * @LastEditTime: 2021-02-20 09:26:19
 -->
-
 # dev-tool-for-python
  a small tool for python development
 
@@ -16,11 +15,17 @@
 
 # Introduction
 
-## Make coding easier and happier. 
+### Recently, I have wrote a lot of python codes but always like this.
 
-## Try something never tried and realize those ridiculous  thoughts.
+![devtool-example](./static/devtool_example.gif)
 
-## Reinvent wheels just for fun.
+![wtf](./static/wtf.jpg)
+
+#### I think i am a bad programmer. o(￣ヘ￣o＃)
+
+#### I will forget where can i find the proper function or method even with a doc-string.(But i seldom write doc-string when coding alone.)
+
+## So i want to develop a tool to record informations when coding by using python decorators.
 
 # HOW TO USE.
 
@@ -28,19 +33,13 @@
 
     pip install -r requestments.txt
 
-## 2. Copy the "devtool" folder into your project, or JUST try
+## 2. Copy the "devtool" folder into your project, or try
 
     pip install DevTool
 
 # Change log
 
-### 2021.4.17
-
-Image Translation alpha version. is not good when image is small. and needs to be smoothed.
-
-![image](./static/imgTrans.gif)
-
-### 2021.4.15
+### 2020.4.15
 
 is going to develop a tool, crop an image, using OCR to get words ,translate.
 
@@ -64,7 +63,7 @@ test script can use [this](./testE2U.py)
 
 2. add function [plot](./devtool/__init__.py)
 
-To use this decorator, try [testPlot.py](./tests/testPlot.py), effect:
+To use this decorator, try [testPlot.py](./testPlot.py), effect:
 
     @traceplot(False)
     def add1(a, b):
@@ -219,7 +218,7 @@ To use this decorator, try [testWrap.test10](./testWrap.py), effect:
                 Average used gpu:          0.0 MB.
                 =============================================================
 
-# Others.
+# Details.
 
 ### 1 For logs filter.
 
@@ -281,6 +280,8 @@ second time:
     aaaaab
 
 
+![linux](./static/devtool_linux.gif)
+
 ### 2 init a new python project
 
     from devtool.devTool import DevTool
@@ -312,6 +313,7 @@ The structure of project is stored in [style.yaml](./devtool/style.yaml).
             utils : root/utils
             tests : root/tests
 
+And "MINE" is my style. :)
 
 
 

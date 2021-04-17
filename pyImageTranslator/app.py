@@ -1,20 +1,102 @@
-import sys
-import time
+'''
+Descripttion: 
+version: 
+Author: xiaoshuyui
+email: guchengxi1994@qq.com
+Date: 2021-04-16 19:00:08
+LastEditors: xiaoshuyui
+LastEditTime: 2021-04-17 11:36:21
+'''
 
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
+import copy
+import sys
+
+from PIL import Image, ImageDraw, ImageFont
+import numpy as np
 sys.path.append("..")
 import threading
+import time
 
-from PyQt5.QtCore import QSize, QThread, pyqtSignal, Qt
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import (QAbstractItemView, QApplication, QDialog,
-                             QHBoxLayout, QLabel, QPushButton, QTableWidget,
-                             QVBoxLayout, QWidget)
-from pyImageTranslator.paddleOCRWrapper import process as pprocess
-from pyImageTranslator.utils.preparation import fakeArgs, changeImgPath
+import cv2
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-__finishState__ = False
+from pyImageTranslator.PaddleOCR.ppocr.utils.utility import (
+    check_and_read_gif, get_image_file_list)
+
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtGui import QIcon, QPainter
+from PyQt5.QtWidgets import (QAbstractItemView, QApplication, QComboBox,
+                             QDialog, QHBoxLayout, QLabel, QPushButton,
+                             QTableWidget, QTableWidgetItem, QVBoxLayout,
+                             QWidget)
+
+from pyImageTranslator.paddleOCRWrapper import TextSystem, getFontSize, polygon2rect
+from pyImageTranslator.utils.preparation import changeImgPath, fakeArgs
+from pyImageTranslator.utils.translator import google
+
+__finishState__ = "start"  # ["start","ocr","end"]
+
+
+def renderImage(args):
+    image_file_list = get_image_file_list(args.image_dir)
+    image_file_list = image_file_list[args.process_id::args.total_process_num]
+    text_sys = TextSystem(args)
+    res = []
+    for image_file in image_file_list:
+        img, flag = check_and_read_gif(image_file)
+        if not flag:
+            img = cv2.imread(image_file)
+        if img is None:
+            print("error in loading image:{}".format(image_file))
+            continue
+        starttime = time.time()
+        dt_boxes, rec_res = text_sys(img)
+        elapse = time.time() - starttime
+        print("Predict time of %s: %.3fs" % (image_file, elapse))
+
+        for text, score in rec_res:
+            print("{}, {:.3f}".format(text, score))
+
+        txts = [rec_res[i][0] for i in range(len(rec_res))]
+        res.append([dt_boxes, txts])
+    # return res
+    global __finishState__
+    __finishState__ = 'ocr'
+    g = google()
+    img = cv2.imread(fakeArgs.image_dir)
+    backImg = copy.deepcopy(img)
+    print("............{}".format(len(res[0])))
+    # print(res[0][1])
+    if len(res) == 0:
+        __finishState__ = 'end'
+    else:
+        for i in range(0, len(res[0][1])):
+            txt = res[0][1][i]
+            print("............" + txt)
+            mi, ma = polygon2rect(res[0][0][i])
+            try:
+                englishTxt = g.translate(txt)[0]
+                if len(englishTxt) == 0:
+                    englishTxt = "Can't explain"
+            except:
+                englishTxt = "WENT ERROR"
+
+            print(englishTxt)
+
+            imgHeight = abs(mi[1] - ma[1])
+            imgWidth = abs(mi[0] - ma[0])
+            im = Image.new("RGB", (imgWidth, imgHeight), (255, 255, 255))
+            dr = ImageDraw.Draw(im)
+            fontSize = getFontSize(imgWidth / len(englishTxt))
+            font = ImageFont.truetype(fakeArgs.vis_font_path,
+                                      size=max(int(fontSize * 1.5), 10),
+                                      encoding="utf-8")
+            print(fontSize)
+            dr.text((0, 0), englishTxt, fill=(0, 0, 0), font=font)
+            im = np.array(im)
+            backImg[mi[1]:ma[1], mi[0]:ma[0]] = im
+        cv2.imwrite("t.png", backImg)
+        __finishState__ = 'end'
 
 
 class Table(QWidget):
@@ -23,7 +105,7 @@ class Table(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Table Image Viewer")
+        self.setWindowTitle("Image Translator")
         # self.resize(1000, 800)
         self.setFixedSize(900, 500)
         # width, height
@@ -45,14 +127,20 @@ class Table(QWidget):
 
         self.btn = QPushButton('Crop', self)
         self.btn.clicked.connect(self.click_btn)
-        self.btn.setFixedSize(100, 50)
+        self.btn.setFixedSize(100, 30)
 
         self.btn_convert = QPushButton('Convert', self)
-        self.btn_convert.setFixedSize(100, 50)
+        self.btn_convert.setFixedSize(100, 30)
         self.btn_convert.clicked.connect(self.convertBtnClick)
+
+        self.cb = QComboBox()
+        self.cb.addItem("Smooth")
+        self.cb.addItem("None")
+        self.cb.setFixedSize(100, 30)
 
         mainLayout.addWidget(self.table)
         conLayout.addWidget(self.btn)
+        conLayout.addWidget(self.cb)
         conLayout.addWidget(self.btn_convert)
         mainLayout.addLayout(conLayout)
         self.setLayout(mainLayout)
@@ -62,7 +150,7 @@ class Table(QWidget):
         self.screenshot = ScreenShotsWin()
         self.screenshot.showFullScreen()
         self.screenshot.exec_()
-        print(type(self.screenshot.cropperedImg))
+        # print(type(self.screenshot.cropperedImg))
         item = QLabel()
         item.resize(400, 400)
         item.setPixmap(self.screenshot.cropperedImg)
@@ -75,7 +163,7 @@ class Table(QWidget):
         self.screenshot.cropperedImg.save(path)
         changeImgPath(path)
 
-        t = Worker(func=pprocess, args=(fakeArgs, ))
+        t = Worker(func=renderImage, args=(fakeArgs, ))
         t.start()
 
         self._loading()
@@ -84,11 +172,40 @@ class Table(QWidget):
         global __finishState__
         l = Loading(self)
         l.show()
-        while __finishState__ != True:
-            time.sleep(1.5)
-        else:
-            print(True)
-            l.close()
+
+        self.thread = RunThread()
+        self.thread.update_pb.connect(l.update_progressbar)  # 关联
+        self.thread.start()
+
+        self.t2 = ShowImage()
+        self.t2.start()
+        self.t2.state.connect(self._show)
+
+    def _show(self,s:str):
+        print(":::::::::::::{}".format(s))
+        if s == 'end':
+            item = QTableWidgetItem()
+            icon = QIcon("t.png")
+            item.setIcon(QIcon(icon))
+            self.table.setItem(0, 1, item)
+        # __finishState__ = "start"
+
+
+class ShowImage(QtCore.QThread):
+    state = pyqtSignal(str)
+
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent=parent)
+        self.running = True
+
+    def run(self):
+        while self.running:
+            global __finishState__
+            self.state.emit(__finishState__)
+            time.sleep(0.2)
+            if __finishState__ == 'end':
+                self.state.emit(__finishState__)
+                self.running = False
 
 
 class Worker(threading.Thread):
@@ -98,9 +215,16 @@ class Worker(threading.Thread):
         self.args = args
 
     def run(self):
-        self.func(*self.args)
         global __finishState__
-        __finishState__ = True
+        __finishState__ = "start"
+        self.result = self.func(*self.args)
+        __finishState__ = "end"
+
+    def get_result(self):
+        try:
+            return self.result
+        except:
+            return None
 
 
 class Ui_Dialog(object):
@@ -136,6 +260,41 @@ class Loading(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
         super(Loading, self).__init__(parent)
         self.setupUi(self)
+
+    def update_progressbar(self, p_int):
+        self.progressBar.setValue(p_int)
+        if p_int == 100:
+            self.close()
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        global __finishState__
+        if __finishState__ != "end":
+            __finishState__ = "canceled"
+
+
+class RunThread(QtCore.QThread):
+    update_pb = QtCore.pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.running = True
+
+    def run(self):
+        while self.running:
+            global __finishState__
+            if __finishState__ == "start":
+                self.update_pb.emit(20)
+            elif __finishState__ == "ocr":
+                self.update_pb.emit(80)
+            elif __finishState__ == "canceled":
+                print("CANCELED BY USER!")
+                self.update_pb.emit(100)
+                self.running = False
+            else:
+                self.update_pb.emit(100)
+                self.running = False
+            time.sleep(0.2)
+        pass
 
 
 class ScreenShotsWin(QDialog):
@@ -222,6 +381,3 @@ if __name__ == '__main__':
     example = Table()
     example.show()
     sys.exit(app.exec_())
-    # from pyImageTranslator.utils.translator import google
-    # g = google()
-    # print(g.translate("你是猪"))
